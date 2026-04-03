@@ -120,6 +120,54 @@ body.spring{background:#87CEEB}body.summer{background:#6dd5fa}body.autumn{backgr
 .toast.show{transform:translate(-50%,-50%) scale(1)}
 .lvl{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);background:linear-gradient(135deg,#FFD700,#FFA500);color:white;padding:28px 36px;border-radius:24px;font-size:1.6em;z-index:200;text-align:center;box-shadow:0 0 60px rgba(255,215,0,.5);transition:transform .4s}
 .lvl.show{transform:translate(-50%,-50%) scale(1)}
+
+/* ===== MOBILE ===== */
+@media(max-width:480px){
+  .gc{padding:8px 6px}
+  .header{padding:10px 10px;border-radius:14px;margin-bottom:8px}
+  .header h1{font-size:1.2em}
+  .stats{gap:8px;font-size:1em}
+  .badge{font-size:.85em;padding:3px 8px}
+
+  /* Tabs: icon only */
+  .tabs{gap:3px;margin-bottom:8px}
+  .tab{padding:10px 2px;font-size:1.3em;line-height:1}
+  .tab .tab-label{display:none}
+
+  /* Panels */
+  .panel{padding:12px 10px;border-radius:14px;font-size:1em}
+
+  /* Seed buttons: icon only */
+  .seed-btn{padding:8px 10px;font-size:1.2em}
+  .seed-btn .seed-label{display:none}
+
+  /* Farm grid */
+  .farm-grid{gap:6px}
+  .plot{font-size:2.5em;min-height:80px;border-width:3px;border-radius:12px}
+  .plot-label{font-size:.3em}
+
+  /* Animal grid */
+  .a-grid{gap:8px}
+  .a-card{padding:12px;border-radius:12px}
+  .a-card .ae{font-size:2.6em}
+  .a-card .an{font-size:1em}
+
+  /* Build grid */
+  .bgrid{gap:6px}
+  .bcard{padding:10px;border-radius:12px}
+  .bcard .be{font-size:2.2em}
+  .bcard .bn{font-size:.9em}
+
+  /* Shop */
+  .customer{padding:10px;gap:8px;border-radius:12px}
+  .customer .ce{font-size:2.2em}
+
+  /* Inventory */
+  .inv{padding:8px 10px;border-radius:10px}
+
+  /* Modal */
+  .modal{padding:18px;border-radius:18px;max-width:92vw}
+}
 </style>
 </head>
 <body class="spring">
@@ -142,10 +190,10 @@ body.spring{background:#87CEEB}body.summer{background:#6dd5fa}body.autumn{backgr
   <div class="inv" id="globalInv" style="margin-bottom:8px"><h3>📦 Lager</h3><div class="inv-items" id="globalInvItems"><span style="color:#999">Tomt!</span></div></div>
 
   <div class="tabs">
-    <button class="tab active" onclick="sTab('farm')">🌱 Odla</button>
-    <button class="tab" onclick="sTab('animals')">🐔 Djur</button>
-    <button class="tab" onclick="sTab('shop')">🏪 Butik</button>
-    <button class="tab" onclick="sTab('build')">🏗️ Bygg</button>
+    <button class="tab active" onclick="sTab('farm')">🌱<span class="tab-label"> Odla</span></button>
+    <button class="tab" onclick="sTab('animals')">🐔<span class="tab-label"> Djur</span></button>
+    <button class="tab" onclick="sTab('shop')">🏪<span class="tab-label"> Butik</span></button>
+    <button class="tab" onclick="sTab('build')">🏗️<span class="tab-label"> Bygg</span></button>
     <button class="tab" onclick="sTab('dev')" id="dev-tab" style="background:rgba(255,100,100,.4);font-size:.85em;display:none">🔧 Dev</button>
   </div>
 
@@ -319,7 +367,7 @@ function rFarm(){
   let h='<div class="seed-sel">';
   for(const[id,s]of Object.entries(SEEDS)){
     if(s.season&&s.season!==S.season&&!S.buildings.greenhouse)continue;
-    h+=`<button class="seed-btn ${S.selectedSeed===id?'sel':''}" onclick="selSeed('${id}')">${s.e} ${s.n}<br><small>${s.c} 💰</small></button>`;}
+    h+=`<button class="seed-btn ${S.selectedSeed===id?'sel':''}" onclick="selSeed('${id}')">${s.e}<span class="seed-label"> ${s.n}<br><small>${s.c} 💰</small></span></button>`;}
   h+='</div>';
   if(sl)h+=`<div style="text-align:center;font-size:.9em;color:#666;margin-bottom:6px">${sl}</div>`;
   h+=`<div style="text-align:center;font-size:.9em;color:#5a3e1b;margin-bottom:6px">🌱 Rutor: ${S.maxPlots} · 🐔 Stall: ${S.maxAnimals}${S.hasSprinkler?' · 💦 Vattenspridare':''}</div>`;
