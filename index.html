@@ -216,7 +216,7 @@ if(new URLSearchParams(location.search).get('dev')==='true'){
 }
 // ===== STATE =====
 const S = {
-  coins:30, xp:0, level:1, xpToNext:20, selectedSeed:'carrot', farmName:'',
+  coins:75, xp:0, level:1, xpToNext:20, selectedSeed:'carrot', farmName:'',
   maxPlots:1, maxAnimals:1,
   plots:[ {type:null,elapsed:0,ready:false,watered:false} ],
   animals:[],
@@ -249,29 +249,29 @@ const ANIMALS = {
 
 const HOUSE_UPG = [
   {e:'⛺',n:'Tält',      c:0,   d:'Ditt första hem'},
-  {e:'🛖',n:'Koja',      c:60,  d:'Tak över huvudet!',    lv:1},
-  {e:'🏚️',n:'Stuga',    c:150, d:'En riktig liten stuga',lv:2},
-  {e:'🏠',n:'Hus',       c:350, d:'Ett fint hus',         lv:3},
-  {e:'🏡',n:'Stort hus', c:600, d:'Hus med trädgård',     lv:4},
-  {e:'🏰',n:'Herrgård',  c:1000,d:'En riktig herrgård!',  lv:5}
+  {e:'🛖',n:'Koja',      c:100, d:'Tak över huvudet!',    lv:1},
+  {e:'🏚️',n:'Stuga',    c:250, d:'En riktig liten stuga',lv:2},
+  {e:'🏠',n:'Hus',       c:550, d:'Ett fint hus',         lv:3},
+  {e:'🏡',n:'Stort hus', c:900, d:'Hus med trädgård',     lv:4},
+  {e:'🏰',n:'Herrgård',  c:1500,d:'En riktig herrgård!',  lv:5}
 ];
 
 const MAX_PLOTS=16, MAX_STALLS=6;
-function plotCost(n){return 20+n*15}
-function stallCost(n){return 30+n*25}
+function plotCost(n){return 35+n*20}
+function stallCost(n){return 50+n*35}
 
 const BUILDINGS = {
-  fence:     {e:'🪵',n:'Staket',       c:50,  d:'Kunder betalar 15% mer',   lv:1},
-  scarecrow: {e:'🧑‍🌾',n:'Fågelskrämma', c:60,  d:'Grödor växer 20% snabbare',lv:1},
-  mailbox:   {e:'📫',n:'Brevlåda',     c:30,  d:'+1 kund i butiken',        lv:1},
-  flowers:   {e:'🌷',n:'Blomrabatt',   c:40,  d:'Djuren blir gladare',      lv:1},
-  well:      {e:'🪣',n:'Brunn',        c:100, d:'Grödor torkar inte ut',    lv:2},
-  greenhouse:{e:'🌿',n:'Växthus',      c:300, d:'Odla alla grödor året runt',lv:3},
-  sprinkler: {e:'💦',n:'Vattenspridare',c:250, d:'Vattnar åkrarna automatiskt',lv:3},
-  pond:      {e:'🐟',n:'Fiskdamm',     c:250, d:'Fångar fisk du kan sälja',  lv:3},
-  windmill:  {e:'🌾',n:'Väderkvarn',   c:400, d:'+20% pris vid försäljning', lv:4},
-  silo:      {e:'🗼',n:'Silo',         c:350, d:'Ger bonusskördar ibland',   lv:4},
-  garden:    {e:'⛲',n:'Trädgård',     c:500, d:'+50% XP på allt',          lv:5}
+  fence:     {e:'🪵',n:'Staket',       c:80,  d:'Kunder betalar 15% mer',   lv:1},
+  scarecrow: {e:'🧑‍🌾',n:'Fågelskrämma', c:90,  d:'Grödor växer 20% snabbare',lv:1},
+  mailbox:   {e:'📫',n:'Brevlåda',     c:50,  d:'+1 kund i butiken',        lv:1},
+  flowers:   {e:'🌷',n:'Blomrabatt',   c:60,  d:'Djuren blir gladare',      lv:1},
+  well:      {e:'🪣',n:'Brunn',        c:175, d:'Grödor torkar inte ut',    lv:2},
+  greenhouse:{e:'🌿',n:'Växthus',      c:500, d:'Odla alla grödor året runt',lv:3},
+  sprinkler: {e:'💦',n:'Vattenspridare',c:400, d:'Vattnar åkrarna automatiskt',lv:3},
+  pond:      {e:'🐟',n:'Fiskdamm',     c:400, d:'Fångar fisk du kan sälja',  lv:3},
+  windmill:  {e:'🌾',n:'Väderkvarn',   c:650, d:'+20% pris vid försäljning', lv:4},
+  silo:      {e:'🗼',n:'Silo',         c:550, d:'Ger bonusskördar ibland',   lv:4},
+  garden:    {e:'⛲',n:'Trädgård',     c:800, d:'+50% XP på allt',          lv:5}
 };
 
 const DECOS = {
