@@ -146,14 +146,14 @@ body.spring{background:#87CEEB}body.summer{background:#6dd5fa}body.autumn{backgr
     <button class="tab" onclick="sTab('animals')">🐔 Djur</button>
     <button class="tab" onclick="sTab('shop')">🏪 Butik</button>
     <button class="tab" onclick="sTab('build')">🏗️ Bygg</button>
-    <button class="tab" onclick="sTab('dev')" style="background:rgba(255,100,100,.4);font-size:.85em">🔧 Dev</button>
+    <button class="tab" onclick="sTab('dev')" id="dev-tab" style="background:rgba(255,100,100,.4);font-size:.85em;display:none">🔧 Dev</button>
   </div>
 
   <div id="farm-panel" class="panel active"></div>
   <div id="animals-panel" class="panel"></div>
   <div id="shop-panel" class="panel"></div>
   <div id="build-panel" class="panel"></div>
-  <div id="dev-panel" class="panel"></div>
+  <div id="dev-panel" class="panel" style="display:none"></div>
 </div>
 
 <div class="mo" id="modal"><div class="modal" id="mc"></div></div>
@@ -161,6 +161,11 @@ body.spring{background:#87CEEB}body.summer{background:#6dd5fa}body.autumn{backgr
 <div class="lvl" id="lvlUp"></div>
 
 <script>
+// ===== DEV MODE =====
+if(new URLSearchParams(location.search).get('dev')==='true'){
+  document.getElementById('dev-tab').style.display='';
+  document.getElementById('dev-panel').style.display='';
+}
 // ===== STATE =====
 const S = {
   coins:30, xp:0, level:1, xpToNext:20, selectedSeed:'carrot', farmName:'',
