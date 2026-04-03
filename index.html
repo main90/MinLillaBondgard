@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Min Lilla Bondgård</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;overflow-x:hidden;touch-action:manipulation;-webkit-user-select:none;user-select:none;transition:background 2s}
+
+.sky{position:fixed;top:0;left:0;right:0;height:45vh;transition:background 2s;z-index:0}
+.sky.spring{background:linear-gradient(180deg,#5ba3d9,#87CEEB 60%,#b5e5ff)}
+.sky.summer{background:linear-gradient(180deg,#2980b9,#6dd5fa 60%,#fff)}
+.sky.autumn{background:linear-gradient(180deg,#c06014,#e8a050 50%,#f0d080)}
+.sky.winter{background:linear-gradient(180deg,#6c7a89,#aab7c4 60%,#dde4ea)}
+body.spring{background:#87CEEB}body.summer{background:#6dd5fa}body.autumn{background:#e8a050}body.winter{background:#aab7c4}
+
+.sun{position:fixed;top:18px;right:28px;width:50px;height:50px;border-radius:50%;z-index:1;animation:pulse 3s ease-in-out infinite;transition:all 1s}
+.sun.sunny{background:#FFD700;box-shadow:0 0 40px #FFD700}.sun.rainy{background:#7f8c8d}.sun.cloudy{background:#bdc3c7}.sun.snowy{background:#ecf0f1;box-shadow:0 0 30px rgba(236,240,241,0.5)}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+
+.cloud{position:fixed;background:white;border-radius:50px;opacity:.8;z-index:1;animation:drift linear infinite}
+.cloud:nth-child(2){top:30px;left:-100px;width:120px;height:40px;animation-duration:25s}
+.cloud:nth-child(3){top:70px;left:-150px;width:160px;height:50px;animation-duration:35s;animation-delay:5s}
+.cloud:nth-child(4){top:50px;left:-80px;width:100px;height:35px;animation-duration:30s;animation-delay:12s}
+@keyframes drift{from{transform:translateX(-200px)}to{transform:translateX(calc(100vw + 200px))}}
+
+.weather-particles{position:fixed;top:0;left:0;right:0;bottom:0;z-index:1;pointer-events:none;overflow:hidden}
+.raindrop{position:absolute;width:2px;background:linear-gradient(transparent,rgba(100,149,237,.6));animation:rain linear infinite}
+@keyframes rain{0%{transform:translateY(-10px);opacity:1}100%{transform:translateY(100vh);opacity:.3}}
+.snowflake{position:absolute;color:white;animation:snow linear infinite;opacity:.9}
+@keyframes snow{0%{transform:translateY(-10px) rotate(0)}100%{transform:translateY(100vh) rotate(360deg)}}
+
+.gc{position:relative;z-index:2;max-width:720px;margin:0 auto;padding:12px;min-height:100vh}
+
+.header{background:rgba(139,90,43,.92);color:white;padding:12px 16px;border-radius:18px;margin-bottom:10px;text-align:center;box-shadow:0 4px 12px rgba(0,0,0,.2)}
+.header h1{font-size:1.5em;margin-bottom:3px}
+.stats{display:flex;justify-content:center;gap:14px;font-size:1.15em;flex-wrap:wrap}
+.badge{padding:4px 12px;border-radius:20px;font-size:.95em;margin-top:4px;display:inline-block}
+.w-badge{background:rgba(255,255,255,.2)}
+
+.tabs{display:flex;gap:4px;margin-bottom:10px}
+.tab{flex:1;padding:11px 3px;border:none;border-radius:14px 14px 4px 4px;font-size:1em;font-weight:700;cursor:pointer;background:rgba(255,255,255,.5);color:#5a3e1b}
+.tab.active{background:#6B8E23;color:white;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.tab{position:relative}
+.tab-badge{position:absolute;top:-4px;right:-2px;background:#e74c3c;color:white;font-size:.65em;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;box-shadow:0 1px 3px rgba(0,0,0,.3);animation:badgePop .3s ease}
+@keyframes badgePop{0%{transform:scale(0)}50%{transform:scale(1.3)}100%{transform:scale(1)}}
+
+.panel{display:none;background:rgba(255,255,255,.88);border-radius:20px;padding:18px;box-shadow:0 4px 16px rgba(0,0,0,.15);min-height:55vh;font-size:1.05em}
+.panel.active{display:block}
+
+/* Farm grid */
+.farm-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
+.plot{aspect-ratio:1;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;border:4px solid #6B4F10;position:relative;font-size:3em;min-height:100px;background:#8B6914}
+.plot:active{transform:scale(.95)}.plot.growing{background:#4a7c10}.plot.ready{background:#2d8b2d;animation:bounce .5s ease-in-out infinite}
+.plot.needs-water{background:#a08020;animation:wiggle 1s ease-in-out infinite}
+.plot.locked{background:#888;border-color:#666;opacity:.35;cursor:default}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-1.5deg)}75%{transform:rotate(1.5deg)}}
+.plot-label{font-size:.28em;color:white;margin-top:2px;font-weight:700}
+.pbar{position:absolute;bottom:8px;left:10%;width:80%;height:8px;background:rgba(0,0,0,.3);border-radius:4px;overflow:hidden}
+.pfill{height:100%;background:#7CFC00;border-radius:4px;transition:width .5s}
+
+.seed-sel{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px}
+.seed-btn{padding:8px 12px;border:3px solid transparent;border-radius:12px;font-size:1.05em;cursor:pointer;background:#f0e6d0}
+.seed-btn.sel{border-color:#6B8E23;background:#d4edaa}
+
+/* Animals */
+.a-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}
+.a-card{background:#f5eedd;border-radius:16px;padding:16px;text-align:center;cursor:pointer;border:3px solid #ddd0b8}
+.a-card:active{transform:scale(.97)}
+.a-card .ae{font-size:3.2em}.a-card .an{font-weight:700;color:#5a3e1b;margin:4px 0;font-size:1.1em}.a-card .ai{font-size:.95em;color:#888}
+.a-card.happy{border-color:#7CFC00;background:#efffea}
+.a-card.needs-care{border-color:#FFA500;animation:wiggle .5s ease-in-out infinite}
+.a-card.hungry{border-color:#e74c3c;background:#fdeaea}
+.buy-btn{display:block;width:100%;padding:14px;margin-top:10px;border:3px dashed #aaa;border-radius:16px;background:#fafafa;font-size:1.15em;cursor:pointer;color:#888}
+
+/* Shop */
+.customer{background:#fff8e8;border-radius:16px;padding:14px;margin-bottom:10px;border:3px solid #f0d890;display:flex;align-items:center;gap:12px}
+.customer .ce{font-size:2.8em}.customer-info{flex:1}
+.cn{font-weight:700;color:#5a3e1b;font-size:1.1em}.cw{font-size:.95em;color:#666;margin:2px 0}
+.sell-btn{padding:10px 16px;background:#6B8E23;color:white;border:none;border-radius:12px;font-size:1.05em;font-weight:700;cursor:pointer}
+.sell-btn:disabled{background:#ccc;cursor:default}
+.inv{background:#f0e6d0;border-radius:14px;padding:12px;margin-bottom:10px}
+.inv h3{color:#5a3e1b;margin-bottom:5px;font-size:1.1em}
+.inv-items{display:flex;flex-wrap:wrap;gap:6px}
+.inv-item{background:white;padding:5px 9px;border-radius:10px;font-size:1em}
+
+/* Build – Canvas farm map */
+.farm-canvas-wrap{border-radius:18px;margin-bottom:12px;border:3px solid #5a8020;overflow:hidden;position:relative}
+.farm-canvas{width:100%;display:block;image-rendering:auto}
+.farm-map-hdr{position:absolute;top:0;left:0;right:0;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;pointer-events:none}
+.farm-map-hdr span{color:white;font-weight:700;text-shadow:1px 1px 3px rgba(0,0,0,.5);font-size:1em}
+.farm-progress{display:flex;align-items:center;gap:6px;font-size:.75em;color:white;font-weight:700;text-shadow:1px 1px 3px rgba(0,0,0,.5)}
+.farm-prog-bar{width:70px;height:8px;background:rgba(0,0,0,.3);border-radius:4px;overflow:hidden}
+.farm-prog-fill{height:100%;background:linear-gradient(90deg,#7CFC00,#4CAF50);border-radius:4px}
+
+.bsec{margin-bottom:14px}
+.bsec h3{color:#5a3e1b;margin-bottom:8px;font-size:1.1em}
+.bgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.bcard{background:#f8f3e8;border-radius:14px;padding:14px;text-align:center;border:3px solid #e8dcc8;cursor:pointer}
+.bcard:active{transform:scale(.97)}.bcard.owned{border-color:#7CFC00;background:#efffea}.bcard.locked{opacity:.4;cursor:default}
+.bcard .be{font-size:2.6em}.bcard .bn{font-weight:700;color:#5a3e1b;font-size:1em;margin:3px 0}
+.bcard .bc{font-size:.9em;color:#888}.bcard .bd{font-size:.8em;color:#aaa;margin-top:2px}
+.bcard.owned .bc{color:#4CAF50}
+
+
+/* Modal */
+.mo{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:100;align-items:center;justify-content:center;padding:20px}
+.mo.show{display:flex}
+.modal{background:white;border-radius:22px;padding:22px;max-width:380px;width:100%;text-align:center}
+.modal h2{color:#5a3e1b;margin-bottom:8px;font-size:1.3em}
+.modal-opts{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.mopt{padding:14px;border:3px solid #ddd;border-radius:14px;background:#fafafa;cursor:pointer;font-size:1.1em}
+.mopt:active{background:#e8f5d0;border-color:#6B8E23}
+.mclose{margin-top:10px;padding:10px 22px;background:#ccc;border:none;border-radius:12px;font-size:1.05em;cursor:pointer}
+
+/* Toast & Level up */
+.toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);background:rgba(0,0,0,.85);color:white;padding:16px 26px;border-radius:16px;font-size:1.2em;z-index:200;pointer-events:none;transition:transform .3s;text-align:center;max-width:85vw}
+.toast.show{transform:translate(-50%,-50%) scale(1)}
+.lvl{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);background:linear-gradient(135deg,#FFD700,#FFA500);color:white;padding:28px 36px;border-radius:24px;font-size:1.6em;z-index:200;text-align:center;box-shadow:0 0 60px rgba(255,215,0,.5);transition:transform .4s}
+.lvl.show{transform:translate(-50%,-50%) scale(1)}
+</style>
+</head>
+<body class="spring">
+<div class="sky spring"></div><div class="sun sunny"></div>
+<div class="cloud"></div><div class="cloud"></div><div class="cloud"></div>
+<div class="weather-particles" id="wp"></div>
+
+<div class="gc">
+  <div class="header">
+    <h1 id="farmTitle">🌻 Min Lilla Bondgård 🌻</h1>
+    <div class="stats">
+      <span>💰 <span id="coins">30</span></span>
+      <span>⭐ Nivå <span id="level">1</span></span>
+      <span title="Erfarenhet — samla XP genom att skörda, samla och sälja!">🌟 <span id="xp">0</span>/<span id="xpMax">20</span> XP</span>
+    </div>
+    <div class="badge w-badge" id="wBadge">☀️ Sol · 🌸 Vår</div>
+    <div class="badge" id="neighborBadge" style="display:none;cursor:pointer;margin-top:4px" onclick="payNeighbor()"></div>
+  </div>
+
+  <div class="inv" id="globalInv" style="margin-bottom:8px"><h3>📦 Lager</h3><div class="inv-items" id="globalInvItems"><span style="color:#999">Tomt!</span></div></div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="sTab('farm')">🌱 Odla</button>
+    <button class="tab" onclick="sTab('animals')">🐔 Djur</button>
+    <button class="tab" onclick="sTab('shop')">🏪 Butik</button>
+    <button class="tab" onclick="sTab('build')">🏗️ Bygg</button>
+    <button class="tab" onclick="sTab('dev')" style="background:rgba(255,100,100,.4);font-size:.85em">🔧 Dev</button>
+  </div>
+
+  <div id="farm-panel" class="panel active"></div>
+  <div id="animals-panel" class="panel"></div>
+  <div id="shop-panel" class="panel"></div>
+  <div id="build-panel" class="panel"></div>
+  <div id="dev-panel" class="panel"></div>
+</div>
+
+<div class="mo" id="modal"><div class="modal" id="mc"></div></div>
+<div class="toast" id="toast"></div>
+<div class="lvl" id="lvlUp"></div>
+
+<script>
+// ===== STATE =====
+const S = {
+  coins:30, xp:0, level:1, xpToNext:20, selectedSeed:'carrot', farmName:'',
+  maxPlots:1, maxAnimals:1,
+  plots:[ {type:null,elapsed:0,ready:false,watered:false} ],
+  animals:[],
+  inventory:{}, customers:[], buildings:{}, decorations:{},
+  houseLevel:0,
+  hasSprinkler:false,
+  neighborDebt:0, neighborMood:'happy', neighborTimer:0,
+  season:'spring', weather:'sunny', wTimer:0, sTimer:0, dayCount:0,
+  pondTimer:0, siloTimer:0
+};
+
+// ===== DATA =====
+const SEEDS = {
+  carrot:    {e:'🥕',n:'Morot',    c:5,  t:20, v:12, xp:3},
+  lettuce:   {e:'🥬',n:'Sallad',   c:4,  t:16, v:9,  xp:2},
+  potato:    {e:'🥔',n:'Potatis',  c:7,  t:24, v:15, xp:4},
+  tomato:    {e:'🍅',n:'Tomat',    c:8,  t:28, v:18, xp:5},
+  corn:      {e:'🌽',n:'Majs',     c:10, t:36, v:24, xp:6},
+  strawberry:{e:'🍓',n:'Jordgubbe',c:12, t:40, v:30, xp:8},
+  pumpkin:   {e:'🎃',n:'Pumpa',    c:15, t:50, v:38, xp:10, season:'autumn'},
+  sunflower: {e:'🌻',n:'Solros',   c:10, t:32, v:22, xp:5,  season:'summer'}
+};
+
+const ANIMALS = {
+  chicken:{e:'🐔',n:'Höna',c:30,prod:'🥚',pn:'Ägg',  intr:30,v:10,xp:3,food:'🌽'},
+  pig:    {e:'🐷',n:'Gris',c:50,prod:'🥓',pn:'Bacon',intr:40,v:18,xp:5,food:'🥔'},
+  sheep:  {e:'🐑',n:'Får', c:60,prod:'🧶',pn:'Ull',  intr:44,v:20,xp:5,food:'🥬'},
+  cow:    {e:'🐄',n:'Ko',  c:80,prod:'🥛',pn:'Mjölk',intr:50,v:25,xp:6,food:'🥕'}
+};
+
+const HOUSE_UPG = [
+  {e:'⛺',n:'Tält',      c:0,   d:'Ditt första hem'},
+  {e:'🛖',n:'Koja',      c:60,  d:'Tak över huvudet!',    lv:1},
+  {e:'🏚️',n:'Stuga',    c:150, d:'En riktig liten stuga',lv:2},
+  {e:'🏠',n:'Hus',       c:350, d:'Ett fint hus',         lv:3},
+  {e:'🏡',n:'Stort hus', c:600, d:'Hus med trädgård',     lv:4},
+  {e:'🏰',n:'Herrgård',  c:1000,d:'En riktig herrgård!',  lv:5}
+];
+
+const MAX_PLOTS=16, MAX_STALLS=6;
+function plotCost(n){return 20+n*15}
+function stallCost(n){return 30+n*25}
+
+const BUILDINGS = {
+  fence:     {e:'🪵',n:'Staket',       c:50,  d:'Kunder betalar 15% mer',   lv:1},
+  scarecrow: {e:'🧑‍🌾',n:'Fågelskrämma', c:60,  d:'Grödor växer 20% snabbare',lv:1},
+  mailbox:   {e:'📫',n:'Brevlåda',     c:30,  d:'+1 kund i butiken',        lv:1},
+  flowers:   {e:'🌷',n:'Blomrabatt',   c:40,  d:'Djuren blir gladare',      lv:1},
+  well:      {e:'🪣',n:'Brunn',        c:100, d:'Grödor torkar inte ut',    lv:2},
+  greenhouse:{e:'🌿',n:'Växthus',      c:300, d:'Odla alla grödor året runt',lv:3},
+  sprinkler: {e:'💦',n:'Vattenspridare',c:250, d:'Vattnar åkrarna automatiskt',lv:3},
+  pond:      {e:'🐟',n:'Fiskdamm',     c:250, d:'Fångar fisk du kan sälja',  lv:3},
+  windmill:  {e:'🌾',n:'Väderkvarn',   c:400, d:'+20% pris vid försäljning', lv:4},
+  silo:      {e:'🗼',n:'Silo',         c:350, d:'Ger bonusskördar ibland',   lv:4},
+  garden:    {e:'⛲',n:'Trädgård',     c:500, d:'+50% XP på allt',          lv:5}
+};
+
+const DECOS = {
+  rosebush:  {e:'🌹',n:'Rosenbuske',   c:15, d:'En vacker rosenbuske'},
+  tulips:    {e:'🌷',n:'Tulpaner',      c:10, d:'Färgglada tulpaner'},
+  sunflowers:{e:'🌻',n:'Solrosor',      c:12, d:'Glada solrosor'},
+  tree:      {e:'🌳',n:'Fruktträd',     c:25, d:'Ett fint äppelträd'},
+  bench:     {e:'🪑',n:'Bänk',          c:20, d:'En viloplats'},
+  child1:    {e:'👧',n:'Lekande barn',  c:30, d:'Ett barn som leker'},
+  child2:    {e:'🧒',n:'Barn med boll', c:30, d:'Ett barn med boll'},
+  cat:       {e:'🐱',n:'Katt',          c:20, d:'En mysig bondgårdskatt'},
+  dog:       {e:'🐕',n:'Hund',          c:25, d:'En vänlig hund'},
+  gnome:     {e:'🍄',n:'Trädgårdstomte',c:15, d:'En liten tomte'},
+  lantern:   {e:'🏮',n:'Lykta',         c:10, d:'En fin trädgårdslykta'},
+  flag:      {e:'🚩',n:'Flagga',        c:8,  d:'En liten flagga'}
+};
+
+
+const SEASON = {spring:{e:'🌸',n:'Vår',g:1},summer:{e:'☀️',n:'Sommar',g:1.3},autumn:{e:'🍂',n:'Höst',g:.9},winter:{e:'❄️',n:'Vinter',g:.5}};
+const WEATHER = {sunny:{e:'☀️',n:'Sol',g:1},rainy:{e:'🌧️',n:'Regn',g:1.5},cloudy:{e:'☁️',n:'Moln',g:.8},snowy:{e:'🌨️',n:'Snö',g:.3}};
+const CNAMES=['Anna','Erik','Lisa','Karl','Maja','Oscar','Ella','Hugo','Saga','Nils','Alma','Axel'];
+const CEMOJI=['👩','👨','👧','🧑','👵','👴','👱‍♀️','👨‍🍳','🧒','👩‍🌾','👨‍🌾','🤠'];
+
+// ===== WEATHER =====
+function growSpeed(){let m=SEASON[S.season].g*WEATHER[S.weather].g;if(S.buildings.greenhouse)m=Math.max(m,.8);if(S.buildings.scarecrow)m*=1.2;return m}
+
+function updWeather(){
+  S.wTimer++;
+  if(S.wTimer>=60){S.wTimer=0;
+    const m={winter:['snowy','snowy','cloudy','sunny'],summer:['sunny','sunny','sunny','cloudy','rainy'],autumn:['cloudy','cloudy','rainy','sunny'],spring:['sunny','sunny','rainy','cloudy']};
+    S.weather=m[S.season][Math.floor(Math.random()*m[S.season].length)];updWVis();}
+}
+function updSeason(){
+  S.sTimer++;
+  if(S.sTimer>=240){S.sTimer=0;S.dayCount++;
+    const s=['spring','summer','autumn','winter'];S.season=s[(s.indexOf(S.season)+1)%4];S.wTimer=25;updWVis();
+    toast(`${SEASON[S.season].e} Nu är det ${SEASON[S.season].n}!`);}
+}
+function updWVis(){
+  document.querySelector('.sky').className='sky '+S.season;
+  document.querySelector('.sun').className='sun '+S.weather;
+  document.body.className=S.season;
+  document.getElementById('wBadge').textContent=`${WEATHER[S.weather].e} ${WEATHER[S.weather].n} · ${SEASON[S.season].e} ${SEASON[S.season].n}`;
+  const c=document.getElementById('wp');c.innerHTML='';
+  if(S.weather==='rainy')for(let i=0;i<40;i++){const d=document.createElement('div');d.className='raindrop';d.style.left=Math.random()*100+'%';d.style.height=(15+Math.random()*20)+'px';d.style.animationDuration=(.4+Math.random()*.3)+'s';d.style.animationDelay=Math.random()*2+'s';c.appendChild(d);}
+  else if(S.weather==='snowy')for(let i=0;i<25;i++){const f=document.createElement('div');f.className='snowflake';f.textContent='❄';f.style.left=Math.random()*100+'%';f.style.fontSize=(10+Math.random()*12)+'px';f.style.animationDuration=(3+Math.random()*4)+'s';f.style.animationDelay=Math.random()*5+'s';c.appendChild(f);}
+  // Rain auto-waters crops
+  if(S.weather==='rainy')S.plots.forEach(p=>{if(p.type)p.watered=true;});
+}
+
+
+// ===== RENDER =====
+function render(){
+  document.getElementById('coins').textContent=S.coins;
+  document.getElementById('level').textContent=S.level;
+  document.getElementById('xp').textContent=S.xp;
+  document.getElementById('xpMax').textContent=S.xpToNext;
+  if(S.farmName)document.getElementById('farmTitle').textContent='🌻 '+S.farmName+' 🌻';
+  rGlobalInv();rFarm();rAnimals();rShop();rBuild();rDev();rBadges();renderNeighborBadge();
+}
+
+function rGlobalInv(){
+  const inv=Object.entries(S.inventory).filter(([,c])=>c>0);
+  const el=document.getElementById('globalInvItems');
+  if(!inv.length){el.innerHTML='<span style="color:#999">Tomt!</span>';return;}
+  let h='';
+  const extra={Fisk:'🐟'};
+  inv.forEach(([item,cnt])=>{const s=SEEDS[item],a=Object.values(ANIMALS).find(x=>x.pn===item);
+    h+=`<span class="inv-item">${s?s.e:a?a.prod:extra[item]||'📦'} ${s?s.n:item} x${cnt}</span>`;});
+  el.innerHTML=h;
+}
+
+function rBadges(){
+  const tabs=document.querySelectorAll('.tab');
+  // Farm: any plot ready to harvest or needs watering
+  const farmBadge=S.plots.some(p=>p.ready)||(S.plots.some(p=>p.type&&!p.watered&&!S.hasSprinkler));
+  // Animals: any hungry or ready to collect
+  const aniBadge=S.animals.some(a=>a.hungry||a.readyToCollect);
+  // Shop: any customers waiting AND we have inventory to sell
+  const shopBadge=S.customers.some(c=>(S.inventory[c.wants]||0)>=c.amount);
+  // Set badges (tabs order: farm, animals, shop, build, dev)
+  [farmBadge,aniBadge,shopBadge,false,false].forEach((b,i)=>{
+    if(!tabs[i])return;
+    const existing=tabs[i].querySelector('.tab-badge');
+    if(b&&!existing){const d=document.createElement('span');d.className='tab-badge';d.textContent='!';tabs[i].appendChild(d);tabs[i].style.position='relative';}
+    else if(!b&&existing)existing.remove();
+  });
+}
+
+function rFarm(){
+  const p=document.getElementById('farm-panel'),sp=growSpeed();
+  const sl=sp>=1.3?'🚀 Snabb tillväxt!':sp<=.5?'🐢 Långsam tillväxt':sp<=.8?'☁️ Lite långsammare':'';
+  let h='<div class="seed-sel">';
+  for(const[id,s]of Object.entries(SEEDS)){
+    if(s.season&&s.season!==S.season&&!S.buildings.greenhouse)continue;
+    h+=`<button class="seed-btn ${S.selectedSeed===id?'sel':''}" onclick="selSeed('${id}')">${s.e} ${s.n}<br><small>${s.c} 💰</small></button>`;}
+  h+='</div>';
+  if(sl)h+=`<div style="text-align:center;font-size:.9em;color:#666;margin-bottom:6px">${sl}</div>`;
+  h+=`<div style="text-align:center;font-size:.9em;color:#5a3e1b;margin-bottom:6px">🌱 Rutor: ${S.maxPlots} · 🐔 Stall: ${S.maxAnimals}${S.hasSprinkler?' · 💦 Vattenspridare':''}</div>`;
+  // XP progress bar
+  const xpPct=Math.round((S.xp/S.xpToNext)*100);
+  h+=`<div style="margin:0 auto 10px;max-width:300px"><div style="display:flex;justify-content:space-between;font-size:.8em;color:#888;margin-bottom:2px"><span>⭐ Nivå ${S.level}</span><span>🌟 ${S.xp}/${S.xpToNext} XP</span></div><div style="height:10px;background:rgba(0,0,0,.1);border-radius:5px;overflow:hidden"><div style="height:100%;width:${xpPct}%;background:linear-gradient(90deg,#f0c040,#e8a020);border-radius:5px;transition:width .5s"></div></div><div style="text-align:center;font-size:.75em;color:#aaa;margin-top:2px">Du får XP av att skörda, samla från djur, sälja & bygga. Vid ${S.xpToNext} XP når du nivå ${S.level+1}!</div></div>`;
+
+  const show=Math.max(S.maxPlots,3);
+  h+='<div class="farm-grid">';
+  for(let i=0;i<show;i++){
+    if(i>=S.maxPlots){h+=`<div class="plot locked"><span>🔒</span><span class="plot-label">Bygg fler i Bygg-fliken</span></div>`;continue;}
+    const pl=S.plots[i];
+    if(!pl||!pl.type){
+      h+=`<div class="plot" onclick="plant(${i})"><span>🕳️</span><span class="plot-label">Plantera</span></div>`;
+    } else if(pl.ready){
+      h+=`<div class="plot ready" onclick="harvest(${i})"><span>${SEEDS[pl.type].e}</span><span class="plot-label">Skörda!</span></div>`;
+    } else if(!pl.watered && !S.hasSprinkler){
+      h+=`<div class="plot needs-water" onclick="water(${i})"><span>🌱</span><span class="plot-label">💧 Vattna!</span></div>`;
+    } else {
+      const pr=Math.min(100,(pl.elapsed/SEEDS[pl.type].t)*100);
+      h+=`<div class="plot growing"><span>🌱</span><span class="plot-label">${SEEDS[pl.type].n}</span><div class="pbar"><div class="pfill" style="width:${pr}%"></div></div></div>`;
+    }
+  }
+  h+='</div>';
+  p.innerHTML=h;
+}
+
+function rAnimals(){
+  const p=document.getElementById('animals-panel');
+  let h=`<div style="text-align:center;font-size:.95em;color:#5a3e1b;margin-bottom:8px">🐔 Djur: ${S.animals.length} / ${S.maxAnimals}</div>`;
+  if(S.animals.length){
+    h+='<div class="a-grid">';
+    S.animals.forEach((a,i)=>{
+      const t=ANIMALS[a.type];
+      let cls='',info='';
+      if(a.hungry){cls='hungry';info=`🍽️ Hungrig! Vill ha ${t.food}`;}
+      else if(a.readyToCollect){cls='needs-care';info=`✨ ${t.pn} klar!`;}
+      else{cls=a.happiness>70?'happy':'';info=`😊 ${Math.round(a.happiness)}% glad`;}
+      h+=`<div class="a-card ${cls}" onclick="interactA(${i})"><div class="ae">${t.e}</div><div class="an">${a.name}</div><div class="ai">${info}</div></div>`;});
+    h+='</div>';}
+  if(S.animals.length<S.maxAnimals)h+=`<button class="buy-btn" onclick="showBuyA()">➕ Köp djur (${S.animals.length}/${S.maxAnimals})</button>`;
+  else h+=`<div style="text-align:center;padding:14px;color:#999;font-size:.95em">Alla stallplatser fulla! Bygg fler i Bygg-fliken.</div>`;
+  p.innerHTML=h;
+}
+
+function rShop(){
+  const p=document.getElementById('shop-panel');let h='';
+  const inv=Object.entries(S.inventory).filter(([k,v])=>v>0);
+  h+='<div class="inv"><h3>📦 Lager</h3><div class="inv-items">';
+  if(!inv.length)h+='<span style="color:#999">Tomt!</span>';
+  else inv.forEach(([item,cnt])=>{const s=SEEDS[item],a=Object.values(ANIMALS).find(x=>x.pn===item),extra={Fisk:'🐟'};h+=`<span class="inv-item">${s?s.e:a?a.prod:extra[item]||'📦'} ${s?s.n:item} x${cnt}</span>`;});
+  h+='</div></div>';
+  if(!S.customers.length)h+='<div style="text-align:center;padding:28px;color:#999;font-size:1.1em">🕐 Väntar på kunder...</div>';
+  else S.customers.forEach((c,i)=>{const ok=(S.inventory[c.wants]||0)>=c.amount;
+    h+=`<div class="customer"><div class="ce">${c.emoji}</div><div class="customer-info"><div class="cn">${c.name}</div><div class="cw">Vill ha: ${c.wantE} ${c.wantN} x${c.amount}</div><div class="cw">Betalar: 💰 ${c.price}</div></div><button class="sell-btn" ${ok?'':'disabled'} onclick="sell(${i})">${ok?'Sälj!':'Saknas'}</button></div>`;});
+  p.innerHTML=h;
+}
+
+// ===== CANVAS FARM DRAWING =====
+let _farmT=0;
+function drawFarm(cv){
+  const W=cv.width,H=cv.height,c=cv.getContext('2d');
+  _farmT++;
+  // Grass
+  c.fillStyle='#6aaa28';c.fillRect(0,0,W,H);
+  for(let i=0;i<60;i++){c.fillStyle=`rgba(${80+Math.random()*40},${150+Math.random()*40},${20+Math.random()*30},0.15)`;const x=((i*97)%W),y=((i*53)%H);c.beginPath();c.ellipse(x,y,12+Math.random()*18,8+Math.random()*12,0,0,Math.PI*2);c.fill();}
+  // Dirt path from center to bottom
+  c.fillStyle='#9a7a48';c.beginPath();c.moveTo(W*.46,H*.55);c.quadraticCurveTo(W*.47,H*.75,W*.48,H);c.lineTo(W*.54,H);c.quadraticCurveTo(W*.53,H*.75,W*.54,H*.55);c.fill();
+  c.fillStyle='#8a6a38';for(let y=H*.56;y<H;y+=12){c.fillRect(W*.48,y,2,4);c.fillRect(W*.52,y+6,2,4);}
+  // Path to crops (upper right)
+  if(S.maxPlots>0){c.fillStyle='#9a7a48';c.beginPath();c.moveTo(W*.55,H*.42);c.quadraticCurveTo(W*.65,H*.35,W*.72,H*.12);c.lineTo(W*.76,H*.14);c.quadraticCurveTo(W*.67,H*.37,W*.57,H*.44);c.fill();}
+  // Path to stall (lower left)
+  if(S.maxAnimals>0){c.fillStyle='#9a7a48';c.beginPath();c.moveTo(W*.43,H*.55);c.quadraticCurveTo(W*.3,H*.6,W*.18,H*.65);c.lineTo(W*.2,H*.68);c.quadraticCurveTo(W*.32,H*.62,W*.45,H*.57);c.fill();}
+  // === FENCE ===
+  if(S.buildings.fence){
+    const m=12,pw=5;c.strokeStyle='#8B6914';c.lineWidth=pw;c.strokeRect(m,m,W-m*2,H-m*2);
+    c.fillStyle='#6B4F10';
+    for(let x=m;x<W-m;x+=28){c.fillRect(x-2,m-3,6,pw+6);c.fillRect(x-2,H-m-3,6,pw+6);}
+    for(let y=m;y<H-m;y+=28){c.fillRect(m-3,y-2,pw+6,6);c.fillRect(W-m-3,y-2,pw+6,6);}
+    // Horizontal rails
+    c.strokeStyle='#a07820';c.lineWidth=2;
+    [.33,.66].forEach(f=>{c.beginPath();c.moveTo(m,m+(H-m*2)*f);c.lineTo(W-m,m+(H-m*2)*f);c.stroke();});
+    // Gate
+    c.fillStyle='#6aaa28';c.fillRect(W*.42,H-m-3,W*.16,pw+8);
+    c.fillStyle='#9a7a48';c.fillRect(W*.44,H-m+1,W*.12,6);
+  }
+  // === CROP ZONE (upper right) ===
+  const cropX=W*.58,cropY=H*.04,cropW=W*.38,cropH=H*.38;
+  if(S.maxPlots>0){
+    c.fillStyle='rgba(80,50,20,0.25)';roundRect(c,cropX-6,cropY-6,cropW+12,cropH+12,8);c.fill();
+  }
+  const cols=4,rows=Math.ceil(MAX_PLOTS/cols);
+  const cw=cropW/cols,ch=cropH/rows;
+  for(let i=0;i<S.maxPlots&&i<MAX_PLOTS;i++){
+    const col=i%cols,row=Math.floor(i/cols);
+    const px=cropX+col*cw+3,py=cropY+row*ch+3,pw=cw-6,ph=ch-6;
+    const pl=S.plots[i];
+    if(pl&&pl.type&&pl.ready){
+      c.fillStyle='#3a7a18';roundRect(c,px,py,pw,ph,4);c.fill();
+      const glow=Math.sin(_farmT*.15)*3;c.shadowColor='rgba(100,255,50,.4)';c.shadowBlur=6+glow;c.fillStyle='#2d8b18';roundRect(c,px,py,pw,ph,4);c.fill();c.shadowBlur=0;
+      drawPlants(c,px,py,pw,ph,'ready',SEEDS[pl.type].e);
+    } else if(pl&&pl.type&&!pl.watered&&!S.hasSprinkler){
+      c.fillStyle='#8a6a28';roundRect(c,px,py,pw,ph,4);c.fill();
+      drawPlants(c,px,py,pw,ph,'dry');
+    } else if(pl&&pl.type){
+      c.fillStyle='#4a8a20';roundRect(c,px,py,pw,ph,4);c.fill();
+      drawPlants(c,px,py,pw,ph,'grow');
+    } else {
+      c.fillStyle='#6a4a20';roundRect(c,px,py,pw,ph,4);c.fill();
+      c.strokeStyle='rgba(150,120,60,.4)';c.lineWidth=1;c.setLineDash([3,3]);c.strokeRect(px+2,py+2,pw-4,ph-4);c.setLineDash([]);
+      for(let r=0;r<3;r++){c.fillStyle='rgba(50,30,10,.15)';c.fillRect(px+4,py+4+r*(ph/3),pw-8,1);}
+    }
+  }
+  // === STALL (lower left) — grows with maxAnimals ===
+  if(S.maxAnimals>=1){
+    const tier=S.maxAnimals<=1?0:S.maxAnimals<=2?1:S.maxAnimals<=4?2:3;
+    const sw=[W*.08,W*.13,W*.20,W*.28][tier],sh=[H*.07,H*.10,H*.15,H*.20][tier];
+    const sx=W*.10,sy=H*.72-sh;
+    // Shadow
+    c.fillStyle='rgba(0,0,0,.06)';c.beginPath();c.ellipse(sx+sw/2,sy+sh+2,sw*.6,3,0,0,Math.PI*2);c.fill();
+    if(tier===0){
+      // Tiny wooden shed
+      c.fillStyle='#8a6a40';c.fillRect(sx,sy+sh*.3,sw,sh*.7);
+      c.fillStyle='#6a4a28';c.beginPath();c.moveTo(sx-2,sy+sh*.33);c.lineTo(sx+sw/2,sy);c.lineTo(sx+sw+2,sy+sh*.33);c.closePath();c.fill();
+      c.fillStyle='#4a3018';c.fillRect(sx+sw*.3,sy+sh*.5,sw*.4,sh*.5);
+    } else {
+      // Barn body
+      c.fillStyle=tier>=2?'#a03420':'#9a4a30';roundRect(c,sx,sy+sh*.25,sw,sh*.75,3);c.fill();
+      c.fillStyle='#7a2010';c.fillRect(sx+3,sy+sh*.25+3,sw-6,2);
+      // Roof
+      c.fillStyle=tier>=2?'#c04828':'#a84020';c.beginPath();c.moveTo(sx-3,sy+sh*.28);c.lineTo(sx+sw/2,sy);c.lineTo(sx+sw+3,sy+sh*.28);c.closePath();c.fill();
+      c.strokeStyle='#6a1808';c.lineWidth=1;c.stroke();
+      // Door
+      c.fillStyle='#5a1808';const dw=sw*.2,dx=sx+sw/2-dw/2;roundRect(c,dx,sy+sh*.5,dw,sh*.48,2);c.fill();
+      // X on door
+      c.strokeStyle='#3a0808';c.lineWidth=1.5;c.beginPath();c.moveTo(dx+3,sy+sh*.55);c.lineTo(dx+dw-3,sy+sh*.85);c.moveTo(dx+dw-3,sy+sh*.55);c.lineTo(dx+3,sy+sh*.85);c.stroke();
+      // Windows at tier 2+
+      if(tier>=2){c.fillStyle='rgba(255,255,200,.5)';c.fillRect(sx+5,sy+sh*.4,sw*.1,sw*.08);c.fillRect(sx+sw-5-sw*.1,sy+sh*.4,sw*.1,sw*.08);}
+      // Hay loft at tier 3
+      if(tier>=3){c.fillStyle='#d4a040';c.beginPath();c.ellipse(sx+sw/2,sy+sh*.15,sw*.08,sh*.06,0,0,Math.PI*2);c.fill();}
+    }
+  }
+  // Animals around stall
+  const animPos=[[W*.12,H*.76],[W*.22,H*.78],[W*.08,H*.80],[W*.30,H*.76],[W*.16,H*.83],[W*.26,H*.82]];
+  S.animals.forEach((a,i)=>{
+    if(i>=animPos.length)return;
+    const[ax,ay]=animPos[i],t=ANIMALS[a.type];
+    const col=t.e==='🐔'?'#d4a020':t.e==='🐷'?'#e8a0a0':t.e==='🐑'?'#e8e8e0':'#8a6040';
+    const bob=Math.sin(_farmT*.1+i*2)*2;
+    c.fillStyle=col;c.beginPath();c.ellipse(ax,ay+bob,10,7,0,0,Math.PI*2);c.fill();
+    c.fillStyle='rgba(0,0,0,.15)';c.beginPath();c.ellipse(ax,ay+9,8,3,0,0,Math.PI*2);c.fill();
+    if(a.hungry){c.fillStyle='#e74c3c';c.font='bold 10px sans-serif';c.textAlign='center';c.fillText('!',ax,ay-10+bob);}
+    if(a.readyToCollect){c.fillStyle='#f0c040';c.font='10px sans-serif';c.textAlign='center';c.fillText('★',ax,ay-10+bob);}
+  });
+  // === HOUSE — scales with houseLevel ===
+  const hl=S.houseLevel;
+  // Size grows with level
+  const hScale=.5+hl*.12;
+  const hw=W*.14*hScale+W*.08,hh=H*.12*hScale+H*.05;
+  const hx=W*.50-hw/2,hy=H*.52-hh;
+  // Shadow
+  c.fillStyle='rgba(0,0,0,.06)';c.beginPath();c.ellipse(hx+hw/2,hy+hh+2,hw*.55,3,0,0,Math.PI*2);c.fill();
+  if(hl===0){// Tiny tent
+    const tw=28,th=22,tx=hx+hw/2-tw/2,ty=hy+hh-th;
+    c.fillStyle='#b07838';c.beginPath();c.moveTo(tx+tw/2,ty);c.lineTo(tx-3,ty+th);c.lineTo(tx+tw+3,ty+th);c.closePath();c.fill();
+    c.strokeStyle='#8a5a20';c.lineWidth=1.5;c.stroke();
+    c.fillStyle='#5a3a10';c.fillRect(tx+tw/2-4,ty+th*.55,8,th*.45);
+    // Small campfire nearby
+    c.fillStyle='#4a3020';c.fillRect(tx+tw+8,ty+th-5,3,5);c.fillRect(tx+tw+12,ty+th-4,3,4);
+    const flicker=Math.sin(_farmT*.2)*2;
+    c.fillStyle='#e08020';c.beginPath();c.ellipse(tx+tw+10,ty+th-6+flicker,4,5+flicker,0,0,Math.PI*2);c.fill();
+    c.fillStyle='#f0c040';c.beginPath();c.ellipse(tx+tw+10,ty+th-7+flicker,2,3,0,0,Math.PI*2);c.fill();
+  } else {
+    const wallC=hl<=2?'#b08040':'#c09858';const roofC=hl<=2?'#8a3020':'#6a2818';
+    c.fillStyle=wallC;roundRect(c,hx,hy+hh*.3,hw,hh*.7,3);c.fill();
+    c.fillStyle=roofC;c.beginPath();c.moveTo(hx-5,hy+hh*.33);c.lineTo(hx+hw/2,hy);c.lineTo(hx+hw+5,hy+hh*.33);c.closePath();c.fill();
+    c.fillStyle='#5a2a10';const ddw=hw*.15;roundRect(c,hx+hw/2-ddw/2,hy+hh*.5,ddw,hh*.48,2);c.fill();
+    if(hl>=2){c.fillStyle='rgba(200,230,255,.6)';c.fillRect(hx+5,hy+hh*.4,hw*.1,hw*.08);c.fillRect(hx+hw-5-hw*.1,hy+hh*.4,hw*.1,hw*.08);}
+    if(hl>=4){c.fillStyle='#4a8a20';c.beginPath();c.arc(hx-5,hy+hh,8,0,Math.PI*2);c.arc(hx+hw+5,hy+hh,8,0,Math.PI*2);c.fill();}
+    if(hl>=5){c.fillStyle=roofC;c.fillRect(hx+hw*.4,hy-hh*.18,hw*.2,hh*.2);c.fillStyle='#f0e0a0';c.fillRect(hx+hw*.44,hy-hh*.12,hw*.12,hw*.06);}
+  }
+  // House label
+  c.fillStyle='white';c.font='bold 11px sans-serif';c.textAlign='center';c.textBaseline='top';
+  c.shadowColor='rgba(0,0,0,.5)';c.shadowBlur=3;c.fillText(HOUSE_UPG[hl].n,hx+hw/2,hy+hh+6);c.shadowBlur=0;
+  // === POND ===
+  if(S.buildings.pond){
+    const px=W*.72,py=H*.72,pr=W*.12;
+    c.fillStyle='#3a7ab8';c.beginPath();c.ellipse(px,py,pr,pr*.7,0,0,Math.PI*2);c.fill();
+    c.fillStyle='rgba(90,180,240,.4)';c.beginPath();c.ellipse(px,py,pr*.9,pr*.6,0,0,Math.PI*2);c.fill();
+    const shimmer=Math.sin(_farmT*.08)*.3+.3;c.fillStyle=`rgba(255,255,255,${shimmer})`;c.beginPath();c.ellipse(px-pr*.3,py-pr*.2,pr*.25,pr*.12,-.3,0,Math.PI*2);c.fill();
+    c.fillStyle='#e07020';const fx=px+Math.sin(_farmT*.06)*pr*.3,fy=py+Math.cos(_farmT*.08)*pr*.2;
+    c.beginPath();c.ellipse(fx,fy,5,3,.4,0,Math.PI*2);c.fill();c.beginPath();c.moveTo(fx+4,fy);c.lineTo(fx+8,fy-3);c.lineTo(fx+8,fy+3);c.closePath();c.fill();
+  }
+  // === GREENHOUSE ===
+  if(S.buildings.greenhouse){
+    const gx=W*.58,gy=H*.46,gw=W*.18,gh=H*.12;
+    c.fillStyle='rgba(180,230,180,.7)';roundRect(c,gx,gy,gw,gh,5);c.fill();
+    c.strokeStyle='rgba(100,170,100,.6)';c.lineWidth=2;roundRect(c,gx,gy,gw,gh,5);c.stroke();
+    for(let lx=gx+gw*.2;lx<gx+gw;lx+=gw*.25){c.strokeStyle='rgba(255,255,255,.3)';c.beginPath();c.moveTo(lx,gy);c.lineTo(lx,gy+gh);c.stroke();}
+    c.fillStyle='rgba(40,120,40,.5)';for(let i=0;i<4;i++){c.beginPath();c.arc(gx+gw*.15+i*gw*.22,gy+gh*.6,4,0,Math.PI*2);c.fill();}
+  }
+  // === WINDMILL ===
+  if(S.buildings.windmill){
+    const wx=W*.14,wy=H*.2,ww=16,wh=50;
+    c.fillStyle='#c8b898';c.fillRect(wx-ww/2,wy,ww,wh);
+    c.strokeStyle='#a09070';c.lineWidth=1;c.strokeRect(wx-ww/2,wy,ww,wh);
+    const angle=_farmT*.04;c.save();c.translate(wx,wy);c.rotate(angle);
+    c.fillStyle='#8a7050';for(let i=0;i<4;i++){c.save();c.rotate(i*Math.PI/2);c.fillRect(-3,-28,6,26);c.restore();}
+    c.restore();
+  }
+  // === GARDEN (fountain + flowers) ===
+  if(S.buildings.garden){
+    const gx=W*.50,gy=H*.86,gr=W*.09;
+    // Stone patio - circular cobblestone
+    c.fillStyle='#b8a890';c.beginPath();c.ellipse(gx,gy+4,gr*1.6,gr*1.1,0,0,Math.PI*2);c.fill();
+    c.fillStyle='#a89880';c.beginPath();c.ellipse(gx,gy+4,gr*1.55,gr*1.05,0,0,Math.PI*2);c.fill();
+    for(let i=0;i<12;i++){const a=i*Math.PI*2/12,d=gr*(1.1+Math.sin(i*3)*.15);c.fillStyle=i%2?'#c0b0a0':'#a89078';c.beginPath();c.ellipse(gx+Math.cos(a)*d*.7,gy+4+Math.sin(a)*d*.5,8,5,a,0,Math.PI*2);c.fill();}
+    // Fountain base - round stone basin
+    c.fillStyle='#8a8078';c.beginPath();c.ellipse(gx,gy+2,gr*.7,gr*.45,0,0,Math.PI*2);c.fill();
+    c.fillStyle='#989088';c.beginPath();c.ellipse(gx,gy,gr*.65,gr*.4,0,0,Math.PI*2);c.fill();
+    // Water in basin
+    c.fillStyle='#5a9abf';c.beginPath();c.ellipse(gx,gy,gr*.55,gr*.32,0,0,Math.PI*2);c.fill();
+    c.fillStyle='rgba(130,200,240,.4)';c.beginPath();c.ellipse(gx-gr*.15,gy-gr*.08,gr*.2,gr*.1,-.2,0,Math.PI*2);c.fill();
+    // Center pillar
+    c.fillStyle='#908880';c.fillRect(gx-3,gy-18,6,18);
+    c.fillStyle='#a09888';c.beginPath();c.ellipse(gx,gy-18,5,3,0,0,Math.PI*2);c.fill();
+    // Water streams - animated arching sprays
+    const wt=_farmT*.1;
+    c.strokeStyle='rgba(100,180,240,.6)';c.lineWidth=1.5;
+    for(let i=0;i<6;i++){
+      const a=i*Math.PI*2/6+wt*.3,reach=gr*.4+Math.sin(wt+i)*3;
+      c.beginPath();c.moveTo(gx,gy-16);
+      const cx1=gx+Math.cos(a)*reach*.5,cy1=gy-22-Math.sin(wt+i*1.3)*4;
+      const ex=gx+Math.cos(a)*reach,ey=gy-2;
+      c.quadraticCurveTo(cx1,cy1,ex,ey);c.stroke();
+      // Splash droplets
+      c.fillStyle='rgba(140,200,250,.5)';
+      const dx=gx+Math.cos(a)*reach*.7,dy=gy-12-Math.sin(wt*1.5+i)*5;
+      c.beginPath();c.arc(dx,dy,1.2,0,Math.PI*2);c.fill();
+    }
+    // Top water bubble
+    const bubY=gy-20-Math.sin(wt*1.5)*2;
+    c.fillStyle='rgba(150,210,250,.6)';c.beginPath();c.arc(gx,bubY,2.5+Math.sin(wt)*1,0,Math.PI*2);c.fill();
+    // Flower beds around fountain
+    const flowerColors=['#e04068','#e8a030','#d060c0','#5070e0','#e06030','#f0d040','#c040e0','#40c060'];
+    for(let i=0;i<10;i++){
+      const a=i*Math.PI*2/10,fd=gr*1.2;
+      const fx=gx+Math.cos(a)*fd*.8,fy=gy+2+Math.sin(a)*fd*.45;
+      // Stem
+      c.fillStyle='#3a8a28';c.fillRect(fx-0.5,fy,1,5);
+      // Petals
+      c.fillStyle=flowerColors[i%flowerColors.length];
+      c.beginPath();c.arc(fx,fy,2.5+Math.sin(i+wt)*.5,0,Math.PI*2);c.fill();
+      c.fillStyle='#f0e060';c.beginPath();c.arc(fx,fy,1,0,Math.PI*2);c.fill();
+    }
+  }
+  // === SINGLE BUILDINGS ===
+  if(S.buildings.mailbox){drawSmallBuilding(c,W*.32,H*.18,'#6a5a4a',8,20);c.fillStyle='#c04040';c.fillRect(W*.32-4,H*.18-4,10,3);}
+  if(S.buildings.scarecrow){const sx2=W*.82,sy2=H*.52;c.fillStyle='#8a6a30';c.fillRect(sx2-1,sy2,3,30);c.fillRect(sx2-12,sy2+6,25,3);c.fillStyle='#d4a040';c.beginPath();c.arc(sx2,sy2-4,7,0,Math.PI*2);c.fill();}
+  if(S.buildings.well){
+    const wx2=W*.12,wy2=H*.42;
+    // Stone base - circular well wall
+    c.fillStyle='#787068';c.beginPath();c.ellipse(wx2,wy2+14,14,8,0,0,Math.PI*2);c.fill();
+    c.fillStyle='#908878';c.beginPath();c.ellipse(wx2,wy2+12,13,7,0,0,Math.PI*2);c.fill();
+    // Stone texture
+    c.fillStyle='#686058';for(let i=0;i<6;i++){const a=i*Math.PI/3;c.fillRect(wx2+Math.cos(a)*10-2,wy2+8+Math.sin(a)*4,4,3);}
+    // Inner dark (hole)
+    c.fillStyle='#2a3040';c.beginPath();c.ellipse(wx2,wy2+11,8,4.5,0,0,Math.PI*2);c.fill();
+    // Water shimmer inside
+    c.fillStyle='rgba(80,150,210,.5)';c.beginPath();c.ellipse(wx2,wy2+12,6,3,0,0,Math.PI*2);c.fill();
+    c.fillStyle='rgba(160,210,240,.3)';c.beginPath();c.ellipse(wx2-2,wy2+11,3,1.5,0,0,Math.PI*2);c.fill();
+    // Wooden posts (two vertical)
+    c.fillStyle='#7a5a30';c.fillRect(wx2-12,wy2-6,3,20);c.fillRect(wx2+9,wy2-6,3,20);
+    // Roof beam (horizontal)
+    c.fillStyle='#6a4a20';c.fillRect(wx2-14,wy2-8,28,3);
+    // Small peaked roof
+    c.fillStyle='#8a4a20';c.beginPath();c.moveTo(wx2-15,wy2-7);c.lineTo(wx2,wy2-16);c.lineTo(wx2+15,wy2-7);c.closePath();c.fill();
+    c.strokeStyle='#5a3010';c.lineWidth=1;c.stroke();
+    // Rope
+    c.strokeStyle='#a08050';c.lineWidth=1;c.beginPath();c.moveTo(wx2,wy2-6);c.lineTo(wx2,wy2+4+Math.sin(_farmT*.08)*2);c.stroke();
+    // Bucket
+    const bucY=wy2+3+Math.sin(_farmT*.08)*2;
+    c.fillStyle='#6a5030';c.fillRect(wx2-3,bucY,6,5);c.fillStyle='#8a6a40';c.fillRect(wx2-4,bucY,8,1.5);
+  }
+  if(S.buildings.sprinkler){const spx=W*.44,spy=H*.28;c.fillStyle='#888';c.fillRect(spx-2,spy,4,15);c.strokeStyle='rgba(100,180,255,.4)';c.lineWidth=1;for(let a=0;a<5;a++){const ang=-Math.PI*.8+a*Math.PI*.2*2/4+Math.sin(_farmT*.1)*.2;c.beginPath();c.moveTo(spx,spy);c.lineTo(spx+Math.cos(ang)*18,spy+Math.sin(ang)*18);c.stroke();}}
+  if(S.buildings.silo){
+    const six=W*.90,siy=H*.54,siW=18,siH=40;
+    // Shadow
+    c.fillStyle='rgba(0,0,0,.08)';c.beginPath();c.ellipse(six,siy+siH+2,siW*.7,4,0,0,Math.PI*2);c.fill();
+    // Cylinder body
+    const grd=c.createLinearGradient(six-siW/2,0,six+siW/2,0);
+    grd.addColorStop(0,'#889098');grd.addColorStop(.3,'#c0c4c8');grd.addColorStop(.5,'#d0d4d8');grd.addColorStop(.7,'#b8bcc0');grd.addColorStop(1,'#8a8e94');
+    c.fillStyle=grd;roundRect(c,six-siW/2,siy+4,siW,siH,2);c.fill();
+    // Horizontal bands
+    c.strokeStyle='rgba(0,0,0,.12)';c.lineWidth=1;
+    for(let b=0;b<4;b++){const by=siy+8+b*(siH/4);c.beginPath();c.moveTo(six-siW/2,by);c.lineTo(six+siW/2,by);c.stroke();}
+    // Metal rivets
+    c.fillStyle='rgba(60,60,70,.3)';
+    for(let b=0;b<4;b++){const by=siy+8+b*(siH/4);c.beginPath();c.arc(six-siW/2+3,by,1.5,0,Math.PI*2);c.fill();c.beginPath();c.arc(six+siW/2-3,by,1.5,0,Math.PI*2);c.fill();}
+    // Dome top
+    c.fillStyle='#a0a4a8';c.beginPath();c.ellipse(six,siy+5,siW/2+1,6,0,Math.PI,Math.PI*2);c.fill();
+    c.fillStyle='#b8bcc0';c.beginPath();c.ellipse(six,siy+5,siW/2,5,0,Math.PI,Math.PI*2);c.fill();
+    // Pointed cap
+    c.fillStyle='#707478';c.beginPath();c.moveTo(six-4,siy+1);c.lineTo(six,siy-6);c.lineTo(six+4,siy+1);c.closePath();c.fill();
+    // Small access door
+    c.fillStyle='#606468';roundRect(c,six-4,siy+siH-10,8,9,1);c.fill();
+    c.fillStyle='#505458';roundRect(c,six-3,siy+siH-9,6,7,1);c.fill();
+    // Highlight streak
+    c.fillStyle='rgba(255,255,255,.1)';c.fillRect(six-siW/2+3,siy+6,3,siH-4);
+  }
+  if(S.buildings.flowers){const flx=W*.36,fly=H*.22;['#e04060','#e0a020','#d060c0','#6060e0','#e06020'].forEach((fc,i)=>{c.fillStyle=fc;c.beginPath();c.arc(flx-8+i*5,fly+Math.sin(i*1.5)*3,3,0,Math.PI*2);c.fill();});c.fillStyle='#2a8a20';c.fillRect(flx-10,fly+4,25,2);}
+  // === DECORATIONS ===
+  const decoSlots=[
+    [W*.38,H*.28],[W*.64,H*.28],[W*.32,H*.44],[W*.68,H*.44],
+    [W*.42,H*.68],[W*.62,H*.68],[W*.76,H*.56],[W*.36,H*.56],
+    [W*.46,H*.76],[W*.58,H*.76],[W*.70,H*.48],[W*.78,H*.88]
+  ];
+  const ownedDecos=Object.keys(S.decorations||{});
+  ownedDecos.forEach((id,i)=>{
+    if(i>=decoSlots.length)return;
+    const[dx,dy]=decoSlots[i],d=DECOS[id];if(!d)return;
+    const bob=Math.sin(_farmT*.06+i*1.7)*2;
+    // Shadow for all decos
+    c.fillStyle='rgba(0,0,0,.07)';c.beginPath();c.ellipse(dx,dy+22,14,4,0,0,Math.PI*2);c.fill();
+
+    if(id==='tree'){
+      // Trunk
+      c.fillStyle='#5a3818';c.fillRect(dx-5,dy+4,10,22);
+      c.fillStyle='#4a2810';c.fillRect(dx-3,dy+8,3,14);
+      // Foliage layers
+      c.fillStyle='#1e7a20';c.beginPath();c.arc(dx,dy-8+bob*.2,18,0,Math.PI*2);c.fill();
+      c.fillStyle='#28922a';c.beginPath();c.arc(dx-8,dy-2+bob*.2,13,0,Math.PI*2);c.fill();
+      c.fillStyle='#32a834';c.beginPath();c.arc(dx+7,dy-4+bob*.2,11,0,Math.PI*2);c.fill();
+      c.fillStyle='#3cba3e';c.beginPath();c.arc(dx-2,dy-14+bob*.2,10,0,Math.PI*2);c.fill();
+      // Apples
+      c.fillStyle='#e03030';
+      [[-8,-4],[6,-8],[0,-16],[-12,2],[10,-2]].forEach(([ox,oy])=>{c.beginPath();c.arc(dx+ox,dy+oy+bob*.2,3.5,0,Math.PI*2);c.fill();});
+      c.fillStyle='#f06060';[[-8,-5],[0,-17]].forEach(([ox,oy])=>{c.beginPath();c.arc(dx+ox+1,dy+oy-1+bob*.2,1.5,0,Math.PI*2);c.fill();});
+
+    } else if(id==='bench'){
+      // Legs
+      c.fillStyle='#5a3818';c.fillRect(dx-14,dy+4,4,14);c.fillRect(dx+10,dy+4,4,14);
+      // Seat
+      c.fillStyle='#7a5a30';roundRect(c,dx-16,dy+2,32,5,2);c.fill();
+      // Back rest
+      c.fillStyle='#6a4a28';roundRect(c,dx-14,dy-10,28,12,2);c.fill();
+      // Planks
+      c.strokeStyle='#5a3a18';c.lineWidth=1;
+      c.beginPath();c.moveTo(dx-13,dy-4);c.lineTo(dx+13,dy-4);c.stroke();
+      c.beginPath();c.moveTo(dx-13,dy+0);c.lineTo(dx+13,dy+0);c.stroke();
+
+    } else if(id==='child1'){
+      // Girl with pigtails
+      const y0=dy+bob;
+      // Hair
+      c.fillStyle='#6a3a18';c.beginPath();c.arc(dx,y0-10,8,0,Math.PI*2);c.fill();
+      c.beginPath();c.arc(dx-9,y0-6,4,0,Math.PI*2);c.fill();
+      c.beginPath();c.arc(dx+9,y0-6,4,0,Math.PI*2);c.fill();
+      // Face
+      c.fillStyle='#f5d0a8';c.beginPath();c.arc(dx,y0-8,6.5,0,Math.PI*2);c.fill();
+      // Eyes & mouth
+      c.fillStyle='#3a2a1a';c.beginPath();c.arc(dx-2.5,y0-9,1.2,0,Math.PI*2);c.fill();c.beginPath();c.arc(dx+2.5,y0-9,1.2,0,Math.PI*2);c.fill();
+      c.fillStyle='#d04050';c.beginPath();c.arc(dx,y0-5.5,1.5,0,Math.PI);c.fill();
+      // Dress
+      c.fillStyle='#e05088';c.beginPath();c.moveTo(dx-6,y0-2);c.lineTo(dx+6,y0-2);c.lineTo(dx+9,y0+12);c.lineTo(dx-9,y0+12);c.closePath();c.fill();
+      // Arms
+      c.fillStyle='#f5d0a8';c.fillRect(dx-9,y0,4,8);c.fillRect(dx+5,y0,4,8);
+      // Legs
+      c.fillStyle='#f5d0a8';c.fillRect(dx-4,y0+12,4,6);c.fillRect(dx,y0+12,4,6);
+      // Shoes
+      c.fillStyle='#c03070';c.fillRect(dx-5,y0+17,5,3);c.fillRect(dx,y0+17,5,3);
+
+    } else if(id==='child2'){
+      // Boy with ball
+      const y0=dy+bob;
+      // Hair
+      c.fillStyle='#4a2a10';c.beginPath();c.arc(dx,y0-10,7.5,0,Math.PI*2);c.fill();
+      // Face
+      c.fillStyle='#f5d0a8';c.beginPath();c.arc(dx,y0-8,6,0,Math.PI*2);c.fill();
+      c.fillStyle='#3a2a1a';c.beginPath();c.arc(dx-2.5,y0-9,1.2,0,Math.PI*2);c.fill();c.beginPath();c.arc(dx+2.5,y0-9,1.2,0,Math.PI*2);c.fill();
+      c.fillStyle='#d04050';c.beginPath();c.arc(dx,y0-5.5,1.5,0,Math.PI);c.fill();
+      // Shirt
+      c.fillStyle='#3080d0';roundRect(c,dx-6,y0-2,12,10,2);c.fill();
+      // Arms
+      c.fillStyle='#f5d0a8';c.fillRect(dx-9,y0,4,7);c.fillRect(dx+5,y0,4,7);
+      // Pants
+      c.fillStyle='#4a6a90';c.fillRect(dx-5,y0+8,5,8);c.fillRect(dx,y0+8,5,8);
+      // Shoes
+      c.fillStyle='#4a3a28';c.fillRect(dx-6,y0+15,6,3);c.fillRect(dx,y0+15,6,3);
+      // Ball
+      const bx=dx+14,by=y0+8+Math.abs(Math.sin(_farmT*.12+i))*6;
+      c.fillStyle='#e08020';c.beginPath();c.arc(bx,by,5,0,Math.PI*2);c.fill();
+      c.strokeStyle='#c06010';c.lineWidth=1;c.beginPath();c.arc(bx,by,5,0,Math.PI*2);c.stroke();
+      c.beginPath();c.moveTo(bx-5,by);c.lineTo(bx+5,by);c.stroke();
+
+    } else if(id==='cat'){
+      const y0=dy+bob;
+      // Body
+      c.fillStyle='#d48030';c.beginPath();c.ellipse(dx,y0+6,10,7,0,0,Math.PI*2);c.fill();
+      // Stripes
+      c.fillStyle='#b06820';c.fillRect(dx-6,y0+2,3,8);c.fillRect(dx-1,y0+1,3,9);c.fillRect(dx+4,y0+2,3,8);
+      // Head
+      c.fillStyle='#d48030';c.beginPath();c.arc(dx-8,y0+2,6,0,Math.PI*2);c.fill();
+      // Ears
+      c.fillStyle='#c07020';c.beginPath();c.moveTo(dx-12,y0-1);c.lineTo(dx-14,y0-7);c.lineTo(dx-8,y0-2);c.fill();
+      c.beginPath();c.moveTo(dx-5,y0-1);c.lineTo(dx-3,y0-7);c.lineTo(dx-7,y0-2);c.fill();
+      // Inner ears
+      c.fillStyle='#e8a0a0';c.beginPath();c.moveTo(dx-11,y0-1);c.lineTo(dx-13,y0-5);c.lineTo(dx-9,y0-1);c.fill();
+      // Eyes
+      c.fillStyle='#40a040';c.beginPath();c.arc(dx-10,y0+1,1.8,0,Math.PI*2);c.fill();c.beginPath();c.arc(dx-6,y0+1,1.8,0,Math.PI*2);c.fill();
+      c.fillStyle='#1a1a1a';c.beginPath();c.ellipse(dx-10,y0+1,0.8,1.5,0,0,Math.PI*2);c.fill();c.beginPath();c.ellipse(dx-6,y0+1,0.8,1.5,0,0,Math.PI*2);c.fill();
+      // Nose
+      c.fillStyle='#e08080';c.beginPath();c.ellipse(dx-8,y0+3,1.2,1,0,0,Math.PI*2);c.fill();
+      // Tail
+      c.strokeStyle='#d48030';c.lineWidth=3;c.beginPath();c.moveTo(dx+9,y0+4);c.quadraticCurveTo(dx+16,y0-4,dx+12,y0-8+Math.sin(_farmT*.08)*3);c.stroke();
+
+    } else if(id==='dog'){
+      const y0=dy+bob;
+      // Body
+      c.fillStyle='#a07040';c.beginPath();c.ellipse(dx,y0+5,13,8,0,0,Math.PI*2);c.fill();
+      // Legs
+      c.fillStyle='#906030';c.fillRect(dx-10,y0+10,5,8);c.fillRect(dx-2,y0+10,5,8);c.fillRect(dx+5,y0+10,5,8);
+      // Head
+      c.fillStyle='#a07040';c.beginPath();c.arc(dx-12,y0,7,0,Math.PI*2);c.fill();
+      // Ear (floppy)
+      c.fillStyle='#805828';c.beginPath();c.ellipse(dx-17,y0+4,4,7,.3,0,Math.PI*2);c.fill();
+      // Snout
+      c.fillStyle='#b88858';c.beginPath();c.ellipse(dx-16,y0+2,4,3,0,0,Math.PI*2);c.fill();
+      // Nose
+      c.fillStyle='#2a1a0a';c.beginPath();c.arc(dx-18,y0+1,2,0,Math.PI*2);c.fill();
+      // Eyes
+      c.fillStyle='#2a1a0a';c.beginPath();c.arc(dx-10,y0-2,1.5,0,Math.PI*2);c.fill();
+      // Tail (wagging)
+      c.strokeStyle='#a07040';c.lineWidth=3;const tailWag=Math.sin(_farmT*.15+i)*15*Math.PI/180;
+      c.beginPath();c.moveTo(dx+12,y0+2);c.quadraticCurveTo(dx+18,y0-8,dx+16+Math.sin(tailWag)*6,y0-12);c.stroke();
+      // Tongue
+      c.fillStyle='#e06080';c.beginPath();c.ellipse(dx-18,y0+4,2,3,0,0,Math.PI*2);c.fill();
+
+    } else if(id==='gnome'){
+      const y0=dy+bob;
+      // Body
+      c.fillStyle='#3060c8';roundRect(c,dx-6,y0+2,12,14,3);c.fill();
+      // Belt
+      c.fillStyle='#2a1a0a';c.fillRect(dx-6,y0+8,12,2);c.fillStyle='#d4a030';c.fillRect(dx-2,y0+7,4,4);
+      // Face
+      c.fillStyle='#f0c8a0';c.beginPath();c.arc(dx,y0-2,7,0,Math.PI*2);c.fill();
+      // Beard
+      c.fillStyle='#e8e0d8';c.beginPath();c.moveTo(dx-5,y0);c.quadraticCurveTo(dx,y0+10,dx+5,y0);c.fill();
+      // Eyes
+      c.fillStyle='#2a2a2a';c.beginPath();c.arc(dx-3,y0-3,1.5,0,Math.PI*2);c.fill();c.beginPath();c.arc(dx+3,y0-3,1.5,0,Math.PI*2);c.fill();
+      // Rosy cheeks
+      c.fillStyle='rgba(220,100,100,.3)';c.beginPath();c.arc(dx-5,y0-1,2.5,0,Math.PI*2);c.fill();c.beginPath();c.arc(dx+5,y0-1,2.5,0,Math.PI*2);c.fill();
+      // Hat
+      c.fillStyle='#d82020';c.beginPath();c.moveTo(dx-7,y0-6);c.lineTo(dx,y0-22);c.lineTo(dx+7,y0-6);c.closePath();c.fill();
+      // Hat brim
+      c.fillStyle='#b81818';c.beginPath();c.ellipse(dx,y0-6,9,3,0,0,Math.PI*2);c.fill();
+      // Shoes
+      c.fillStyle='#4a2a10';c.beginPath();c.ellipse(dx-5,y0+17,5,3,-.2,0,Math.PI*2);c.fill();
+      c.beginPath();c.ellipse(dx+5,y0+17,5,3,.2,0,Math.PI*2);c.fill();
+
+    } else if(id==='lantern'){
+      // Pole
+      c.fillStyle='#3a3a3a';c.fillRect(dx-2,dy-2,4,24);
+      // Curved arm
+      c.strokeStyle='#3a3a3a';c.lineWidth=2.5;c.beginPath();c.moveTo(dx,dy-2);c.quadraticCurveTo(dx+8,dy-8,dx+6,dy-14);c.stroke();
+      // Lantern body
+      c.fillStyle='#4a4038';roundRect(c,dx+1,dy-18,10,10,2);c.fill();
+      // Glass
+      c.fillStyle='#f0d860';c.fillRect(dx+3,dy-16,6,6);
+      // Glow
+      const glow=Math.sin(_farmT*.1+i)*.2+.3;
+      c.fillStyle=`rgba(255,220,80,${glow})`;c.beginPath();c.arc(dx+6,dy-13,14,0,Math.PI*2);c.fill();
+      // Top cap
+      c.fillStyle='#3a3a3a';c.fillRect(dx,dy-19,12,2);
+      c.beginPath();c.moveTo(dx+3,dy-19);c.lineTo(dx+6,dy-22);c.lineTo(dx+9,dy-19);c.fill();
+
+    } else if(id==='rosebush'){
+      // Bush body
+      c.fillStyle='#1a7a1a';c.beginPath();c.arc(dx,dy+4,14,0,Math.PI*2);c.fill();
+      c.fillStyle='#228a22';c.beginPath();c.arc(dx-6,dy+1,10,0,Math.PI*2);c.fill();
+      c.fillStyle='#2a9a2a';c.beginPath();c.arc(dx+5,dy-1,11,0,Math.PI*2);c.fill();
+      // Roses
+      const rosePos=[[-8,-4],[4,-6],[0,4],[8,2],[-4,8],[-10,4],[6,-1]];
+      rosePos.forEach(([ox,oy],ri)=>{
+        c.fillStyle='#d01838';c.beginPath();c.arc(dx+ox,dy+oy+Math.sin(_farmT*.05+ri)*.5,4,0,Math.PI*2);c.fill();
+        c.fillStyle='#e83858';c.beginPath();c.arc(dx+ox-1,dy+oy-1,2,0,Math.PI*2);c.fill();
+      });
+
+    } else if(id==='tulips'){
+      // Multiple tulips in a row
+      const tulipCols=['#e040a0','#f0d020','#f06030','#a040e0','#40a0e0'];
+      for(let t=0;t<5;t++){
+        const tx=dx-16+t*8,sway=Math.sin(_farmT*.07+t*1.2)*2;
+        // Stem
+        c.strokeStyle='#2a8a20';c.lineWidth=2;c.beginPath();c.moveTo(tx,dy+18);c.quadraticCurveTo(tx+sway,dy+6,tx+sway,dy-4);c.stroke();
+        // Leaf
+        if(t%2===0){c.fillStyle='#2a8a20';c.beginPath();c.ellipse(tx+3,dy+10,2,6,.4,0,Math.PI*2);c.fill();}
+        // Tulip head
+        c.fillStyle=tulipCols[t];
+        c.beginPath();c.moveTo(tx+sway-4,dy-2);c.quadraticCurveTo(tx+sway,dy-12,tx+sway+4,dy-2);c.closePath();c.fill();
+        c.fillStyle='rgba(0,0,0,.1)';c.beginPath();c.moveTo(tx+sway-1,dy-2);c.quadraticCurveTo(tx+sway,dy-10,tx+sway+1,dy-2);c.fill();
+      }
+
+    } else if(id==='sunflowers'){
+      for(let sf=0;sf<3;sf++){
+        const sx2=dx-12+sf*12,sway=Math.sin(_farmT*.06+sf*1.5)*1.5;
+        // Stem
+        c.strokeStyle='#3a8a20';c.lineWidth=3;c.beginPath();c.moveTo(sx2,dy+18);c.quadraticCurveTo(sx2+sway,dy,sx2+sway,dy-10);c.stroke();
+        // Leaf
+        c.fillStyle='#3a8a20';c.beginPath();c.ellipse(sx2+(sf%2?4:-4),dy+8,3,7,.3*(sf%2?1:-1),0,Math.PI*2);c.fill();
+        // Petals
+        const fc=dx-12+sf*12+sway,fy=dy-12;
+        for(let p=0;p<8;p++){
+          const pa=p*Math.PI/4;
+          c.fillStyle='#f0c020';c.beginPath();c.ellipse(fc+Math.cos(pa)*8,fy+Math.sin(pa)*8,3,6,pa,0,Math.PI*2);c.fill();
+        }
+        // Center
+        c.fillStyle='#6a4a18';c.beginPath();c.arc(fc,fy,5,0,Math.PI*2);c.fill();
+        c.fillStyle='#8a6028';c.beginPath();c.arc(fc-1,fy-1,2.5,0,Math.PI*2);c.fill();
+      }
+
+    } else if(id==='flag'){
+      // Pole
+      c.fillStyle='#7a6a50';c.fillRect(dx-1.5,dy-14,3,32);
+      // Ball on top
+      c.fillStyle='#d4a030';c.beginPath();c.arc(dx,dy-14,3,0,Math.PI*2);c.fill();
+      // Flag (waving)
+      const wave=Math.sin(_farmT*.1)*3;
+      c.fillStyle='#e04040';c.beginPath();
+      c.moveTo(dx+1.5,dy-12);c.quadraticCurveTo(dx+10,dy-10+wave,dx+18,dy-10);
+      c.lineTo(dx+16,dy-2);c.quadraticCurveTo(dx+8,dy-4+wave,dx+1.5,dy-2);c.closePath();c.fill();
+      // Cross/emblem
+      c.fillStyle='#f0d040';c.fillRect(dx+6,dy-9,8,2);c.fillRect(dx+9,dy-11,2,6);
+    }
+  });
+}
+
+function drawPlants(c,px,py,pw,ph,state,emoji){
+  const rows=2,cols=3;
+  for(let r=0;r<rows;r++)for(let cl=0;cl<cols;cl++){
+    const x=px+6+cl*(pw-12)/(cols-1),y=py+6+r*(ph-12)/(rows-1);
+    if(state==='ready'){c.fillStyle='#2a6a10';c.beginPath();c.moveTo(x,y+6);c.lineTo(x-4,y-2);c.lineTo(x+4,y-2);c.closePath();c.fill();c.fillStyle='#d04020';c.beginPath();c.arc(x,y-3,3,0,Math.PI*2);c.fill();}
+    else if(state==='grow'){c.fillStyle='#4aaa28';c.fillRect(x-1,y,2,6);c.fillStyle='#5aba38';c.beginPath();c.ellipse(x,y-1,3,2,0,0,Math.PI*2);c.fill();}
+    else{c.fillStyle='#8a7a40';c.fillRect(x-1,y+2,2,4);}
+  }
+}
+function drawSmallBuilding(c,x,y,color,w,h){c.fillStyle=color;c.fillRect(x-w/2,y,w,h);}
+function roundRect(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.lineTo(x+w-r,y);c.quadraticCurveTo(x+w,y,x+w,y+r);c.lineTo(x+w,y+h-r);c.quadraticCurveTo(x+w,y+h,x+w-r,y+h);c.lineTo(x+r,y+h);c.quadraticCurveTo(x,y+h,x,y+h-r);c.lineTo(x,y+r);c.quadraticCurveTo(x,y,x+r,y);c.closePath();}
+
+function rBuild(){
+  const p=document.getElementById('build-panel');let h='';
+  const house=HOUSE_UPG[S.houseLevel];
+  const totalB=Object.keys(BUILDINGS).length,ownedB=Object.keys(S.buildings).length,ownedD=Object.keys(S.decorations||{}).length;
+  const progPct=Math.round(((S.maxPlots+S.maxAnimals+ownedB+ownedD+S.houseLevel)/(MAX_PLOTS+MAX_STALLS+totalB+12+5))*100);
+
+  // === CANVAS MAP ===
+  h+='<div class="farm-canvas-wrap"><canvas id="farmCv" class="farm-canvas" width="500" height="500"></canvas>';
+  h+='<div class="farm-map-hdr"><span>Din bondgård</span><span class="farm-progress">'+progPct+'%<span class="farm-prog-bar"><span class="farm-prog-fill" style="width:'+progPct+'%"></span></span></span></div></div>';
+
+  // === HOUSE UPGRADE ===
+  h+='<div class="bsec"><h3>🏠 Ditt hem: '+house.e+' '+house.n+'</h3>';
+  if(S.houseLevel<HOUSE_UPG.length-1){
+    const nx=HOUSE_UPG[S.houseLevel+1],ok=S.coins>=nx.c&&(!nx.lv||S.level>=nx.lv);
+    h+=`<div class="bcard ${ok?'':'locked'}" onclick="upgHouse()" style="margin-bottom:10px"><div class="be">${house.e} ➡️ ${nx.e}</div><div class="bn">Uppgradera till ${nx.n}</div><div class="bc">💰 ${nx.c}</div><div class="bd">${nx.d}${nx.lv&&S.level<nx.lv?` (Nivå ${nx.lv})`:''}</div></div>`;
+  } else h+='<div class="bcard owned" style="margin-bottom:10px"><div class="be">🏰</div><div class="bn">Max nivå!</div><div class="bc">✅ Fullt uppgraderat</div></div>';
+  h+='</div>';
+
+  // === EXPAND FARM ===
+  const pc=plotCost(S.maxPlots),sc=stallCost(S.maxAnimals);
+  const plotMax=S.maxPlots>=MAX_PLOTS, stallMax=S.maxAnimals>=MAX_STALLS;
+  h+='<div class="bsec"><h3>📐 Bygg ut</h3><div class="bgrid">';
+  if(plotMax) h+='<div class="bcard owned"><div class="be">🌱</div><div class="bn">Alla odlingsrutor</div><div class="bc">✅ Fullt utbyggt!</div><div class="bd">'+S.maxPlots+' rutor</div></div>';
+  else h+=`<div class="bcard ${S.coins<pc?'locked':''}" onclick="buyPlot()"><div class="be">🌱</div><div class="bn">+1 Odlingsruta</div><div class="bc">💰 ${pc}</div><div class="bd">Har ${S.maxPlots}/${MAX_PLOTS} rutor</div></div>`;
+  const stallName=S.maxAnimals<=1?'Litet stall':S.maxAnimals<=3?'Stall':S.maxAnimals<=5?'Stort stall':'Jättestall';
+  if(stallMax) h+=`<div class="bcard owned"><div class="be">🐄</div><div class="bn">${stallName}</div><div class="bc">✅ Fullt utbyggt!</div><div class="bd">${S.maxAnimals} platser</div></div>`;
+  else h+=`<div class="bcard ${S.coins<sc?'locked':''}" onclick="buyStall()"><div class="be">🐄</div><div class="bn">+1 Stallplats</div><div class="bc">💰 ${sc}</div><div class="bd">${stallName} — ${S.maxAnimals}/${MAX_STALLS} platser</div></div>`;
+  h+='</div></div>';
+
+  // === BUILDINGS ===
+  h+='<div class="bsec"><h3>🏗️ Byggnader</h3><div class="bgrid">';
+  for(const[id,b]of Object.entries(BUILDINGS)){
+    const own=!!S.buildings[id],ok=S.coins>=b.c&&S.level>=b.lv;
+    h+=`<div class="bcard ${own?'owned':!ok?'locked':''}" onclick="${own?'':`buyB('${id}')`}"><div class="be">${b.e}</div><div class="bn">${b.n}</div><div class="bc">${own?'✅ Köpt!':`💰 ${b.c}`}</div><div class="bd">${b.d}${S.level<b.lv&&!own?` (Nivå ${b.lv})`:''}</div></div>`;
+  }
+  h+='</div></div>';
+
+  // === DECORATIONS ===
+  const ownedDecoCount=Object.keys(S.decorations||{}).length;
+  h+='<div class="bsec"><h3>🎀 Prydnader <small style="color:#999;font-weight:400">('+ownedDecoCount+'/12 — gör gården finare!)</small></h3><div class="bgrid">';
+  for(const[id,d]of Object.entries(DECOS)){
+    const own=!!S.decorations[id],ok=S.coins>=d.c&&ownedDecoCount<12;
+    h+=`<div class="bcard ${own?'owned':!ok?'locked':''}" onclick="${own?'':`buyDeco('${id}')`}"><div class="be">${d.e}</div><div class="bn">${d.n}</div><div class="bc">${own?'✅ Köpt!':`💰 ${d.c}`}</div><div class="bd">${d.d}</div></div>`;
+  }
+  h+='</div></div>';
+
+  p.innerHTML=h;
+  // Draw canvas after DOM update
+  const cv=document.getElementById('farmCv');
+  if(cv)drawFarm(cv);
+}
+
+
+// ===== ACTIONS =====
+function selSeed(id){S.selectedSeed=id;rFarm();}
+
+function plant(i){
+  const s=SEEDS[S.selectedSeed];
+  if(S.coins<s.c){if(S.coins<4&&S.neighborDebt<=0)offerNeighborHelp();else toast('💰 Inte tillräckligt!');return;}
+  S.coins-=s.c;S.plots[i]={type:S.selectedSeed,elapsed:0,ready:false,watered:false};
+  // Auto-water if sprinkler or rainy
+  if(S.hasSprinkler||S.weather==='rainy')S.plots[i].watered=true;
+  toast(`${s.e} Planterade ${s.n}!`);render();
+}
+
+function water(i){
+  const pl=S.plots[i];if(!pl||!pl.type||pl.ready||pl.watered)return;
+  pl.watered=true;toast('💧 Vattnat!');render();
+}
+
+function harvest(i){
+  const pl=S.plots[i],s=SEEDS[pl.type];
+  S.plots[i]={type:null,elapsed:0,ready:false,watered:false};
+  addInv(pl.type,1);addXP(s.xp);toast(`${s.e} Skördade ${s.n}! +${s.xp}⭐`);render();
+}
+
+function buyPlot(){
+  if(S.maxPlots>=MAX_PLOTS){toast('🌱 Alla odlingsrutor är utbyggda!');return;}
+  const c=plotCost(S.maxPlots);if(S.coins<c){if(S.coins<4&&S.neighborDebt<=0)offerNeighborHelp();else toast('💰 Inte tillräckligt!');return;}
+  S.coins-=c;S.maxPlots++;S.plots.push({type:null,elapsed:0,ready:false,watered:false});addXP(5);
+  toast(`🌱 Ny odlingsruta! (${S.maxPlots} totalt)`);render();
+}
+function buyStall(){
+  if(S.maxAnimals>=MAX_STALLS){toast('🐔 Stallet är fullt utbyggt!');return;}
+  const c=stallCost(S.maxAnimals);if(S.coins<c){toast('💰 Inte tillräckligt!');return;}
+  S.coins-=c;S.maxAnimals++;addXP(5);toast(`🐔 Ny stallplats! (${S.maxAnimals} totalt)`);render();
+}
+
+function showBuyA(){
+  if(S.animals.length>=S.maxAnimals){toast('🐔 Inga platser!');return;}
+  let h='<h2>🐔 Köp djur</h2><div class="modal-opts">';
+  for(const[id,a]of Object.entries(ANIMALS))h+=`<div class="mopt" onclick="buyA('${id}')">${a.e} ${a.n} — ${a.c} 💰<br><small>Ger: ${a.prod} ${a.pn} · Äter: ${a.food}</small></div>`;
+  h+='</div><button class="mclose" onclick="closeM()">Stäng</button>';
+  document.getElementById('mc').innerHTML=h;document.getElementById('modal').classList.add('show');
+}
+
+function buyA(type){
+  if(S.animals.length>=S.maxAnimals){toast('🐔 Inga platser!');closeM();return;}
+  const a=ANIMALS[type];if(S.coins<a.c){if(S.coins<4&&S.neighborDebt<=0)offerNeighborHelp();else toast('💰 Inte tillräckligt!');return;}
+  S.coins-=a.c;S.animals.push({type,name:a.n,happiness:100,elapsed:0,readyToCollect:false,hungry:false,hungerTimer:0,fedCount:0});
+  closeM();toast(`${a.e} Köpte en ${a.n}!`);render();
+}
+
+function interactA(i){
+  const a=S.animals[i],t=ANIMALS[a.type];
+  if(a.hungry){
+    // Try to feed – find matching food in inventory
+    const foodSeed=Object.entries(SEEDS).find(([id,s])=>s.e===t.food);
+    const foodKey=foodSeed?foodSeed[0]:null;
+    if(foodKey&&(S.inventory[foodKey]||0)>0){
+      S.inventory[foodKey]--;a.hungry=false;a.hungerTimer=0;a.happiness=Math.min(100,a.happiness+25);a.fedCount++;
+      addXP(2);toast(`${t.food} Matade ${a.name}! 😋`);
+    } else {
+      toast(`${t.food} Du behöver ${t.food} i lagret!`);
+    }
+  } else if(a.readyToCollect){
+    a.readyToCollect=false;a.elapsed=0;a.happiness=Math.min(100,a.happiness+10);
+    addInv(t.pn,1);addXP(t.xp);toast(`${t.prod} Samlade ${t.pn}!`);
+  } else {
+    a.happiness=Math.min(100,a.happiness+15);toast(`${t.e} Du klappade ${a.name}! 💕`);
+  }
+  render();
+}
+
+function sell(ci){
+  const c=S.customers[ci];if((S.inventory[c.wants]||0)<c.amount)return;
+  S.inventory[c.wants]-=c.amount;
+  let bonus=0,tips=[];
+  if(S.buildings.windmill){const b=Math.floor(c.price*.2);bonus+=b;tips.push('väderkvarn +'+b);}
+  if(S.buildings.fence){const b=Math.floor(c.price*.15);bonus+=b;tips.push('staket +'+b);}
+  S.coins+=c.price+bonus;addXP(c.amount*2);S.customers.splice(ci,1);
+  toast(`💰 +${c.price+bonus} mynt!${tips.length?' ('+tips.join(', ')+')':''}`);render();
+}
+
+function buyB(id){
+  const b=BUILDINGS[id];if(!b||S.buildings[id])return;
+  if(S.coins<b.c){toast('💰 Inte tillräckligt!');return;}
+  if(S.level<b.lv){toast(`⭐ Nivå ${b.lv} krävs!`);return;}
+  S.coins-=b.c;S.buildings[id]=true;addXP(Math.floor(b.c/10));
+  if(id==='sprinkler'){S.hasSprinkler=true;S.plots.forEach(p=>{if(p.type)p.watered=true;});toast('💦 Vattenspridare! Allt vattnas nu automatiskt!');}
+  else toast(`${b.e} ${b.n} byggt!`);
+  render();
+}
+
+function buyDeco(id){
+  const d=DECOS[id];if(!d||S.decorations[id])return;
+  if(Object.keys(S.decorations).length>=12){toast('🎀 Max 12 prydnader!');return;}
+  if(S.coins<d.c){toast('💰 Inte tillräckligt!');return;}
+  S.coins-=d.c;S.decorations[id]=true;
+  toast(`${d.e} ${d.n} placerad!`);render();
+}
+
+function upgHouse(){
+  if(S.houseLevel>=HOUSE_UPG.length-1)return;
+  const nx=HOUSE_UPG[S.houseLevel+1];
+  if(S.coins<nx.c){toast('💰 Inte tillräckligt!');return;}
+  if(nx.lv&&S.level<nx.lv){toast(`⭐ Nivå ${nx.lv} krävs!`);return;}
+  S.coins-=nx.c;S.houseLevel++;addXP(Math.floor(nx.c/8));
+  toast(`${nx.e} Uppgraderade till ${nx.n}!`);render();
+}
+
+// ===== SAVE & LOAD =====
+const SK='bondgard_v5';
+function save(){try{localStorage.setItem(SK,JSON.stringify({
+  farmName:S.farmName,coins:S.coins,xp:S.xp,level:S.level,xpToNext:S.xpToNext,
+  plots:S.plots,maxPlots:S.maxPlots,maxAnimals:S.maxAnimals,
+  animals:S.animals,inventory:S.inventory,buildings:S.buildings,
+  houseLevel:S.houseLevel,hasSprinkler:S.hasSprinkler,decorations:S.decorations,
+  neighborDebt:S.neighborDebt,neighborMood:S.neighborMood,neighborTimer:S.neighborTimer,
+  season:S.season,sTimer:S.sTimer,dayCount:S.dayCount,t:Date.now()
+}));}catch(e){}}
+
+function load(){try{
+  const d=localStorage.getItem(SK);if(!d)return false;const s=JSON.parse(d);
+  S.farmName=s.farmName||'';S.coins=s.coins??30;S.xp=s.xp??0;S.level=s.level??1;S.xpToNext=s.xpToNext??20;
+  S.maxPlots=s.maxPlots??1;S.maxAnimals=s.maxAnimals??1;
+  S.plots=s.plots??[{type:null,elapsed:0,ready:false,watered:false}];
+  S.animals=s.animals??[];S.inventory=s.inventory??{};S.buildings=s.buildings??{};
+  S.houseLevel=s.houseLevel??0;S.hasSprinkler=s.hasSprinkler??false;S.decorations=s.decorations??{};
+  S.neighborDebt=s.neighborDebt??0;S.neighborMood=s.neighborMood??'happy';S.neighborTimer=s.neighborTimer??0;
+  S.season=s.season??'spring';S.sTimer=s.sTimer??0;S.dayCount=s.dayCount??0;
+  while(S.plots.length<S.maxPlots)S.plots.push({type:null,elapsed:0,ready:false,watered:false});
+  // Ensure animals have hunger fields
+  S.animals.forEach(a=>{if(a.hungry===undefined){a.hungry=false;a.hungerTimer=0;a.fedCount=0;}});
+  return true;}catch(e){return false;}}
+
+function resetGame(){if(confirm('Börja om? Allt försvinner!')){localStorage.removeItem(SK);location.reload();}}
+
+// ===== HELPERS =====
+function addInv(item,n){S.inventory[item]=(S.inventory[item]||0)+n;}
+function addXP(n){const bonus=S.buildings.garden?1.5:1;S.xp+=Math.floor(n*bonus);while(S.xp>=S.xpToNext){S.xp-=S.xpToNext;S.level++;S.xpToNext=Math.floor(S.xpToNext*1.5);showLvl();}}
+function toast(m){const e=document.getElementById('toast');e.textContent=m;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),1800);}
+function showLvl(){const e=document.getElementById('lvlUp');e.innerHTML=`🎉 Nivå ${S.level}! 🎉<br><small>Nästa nivå: ${S.xpToNext} XP</small>`;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),2500);}
+function closeM(){document.getElementById('modal').classList.remove('show');}
+function sTab(t){document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));document.querySelector(`.tab[onclick="sTab('${t}')"]`).classList.add('active');document.getElementById(`${t}-panel`).classList.add('active');}
+
+// ===== DEV PANEL =====
+function rDev(){
+  const p=document.getElementById('dev-panel');
+  p.innerHTML=`<h2 style="text-align:center">🔧 Fuskläge</h2>
+  <p style="text-align:center;color:#888;margin:8px 0">Bara för testning!</p>
+  <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:14px">
+    <button onclick="cheat('coins',100)" style="padding:12px 18px;border-radius:14px;border:none;background:#f0c040;font-size:1.1em;cursor:pointer;font-weight:700">💰 +100 Mynt</button>
+    <button onclick="cheat('coins',1000)" style="padding:12px 18px;border-radius:14px;border:none;background:#f0a020;font-size:1.1em;cursor:pointer;font-weight:700">💰 +1000 Mynt</button>
+    <button onclick="cheat('coins',10000)" style="padding:12px 18px;border-radius:14px;border:none;background:#e07010;color:white;font-size:1.1em;cursor:pointer;font-weight:700">💰 +10 000 Mynt</button>
+    <button onclick="cheat('xp',50)" style="padding:12px 18px;border-radius:14px;border:none;background:#7ecb7e;font-size:1.1em;cursor:pointer;font-weight:700">⭐ +50 XP</button>
+    <button onclick="cheat('xp',500)" style="padding:12px 18px;border-radius:14px;border:none;background:#4caf50;color:white;font-size:1.1em;cursor:pointer;font-weight:700">⭐ +500 XP</button>
+    <button onclick="cheatGrow()" style="padding:12px 18px;border-radius:14px;border:none;background:#8e6ac8;color:white;font-size:1.1em;cursor:pointer;font-weight:700">🌾 Mogna alla grödor</button>
+    <button onclick="cheatCollect()" style="padding:12px 18px;border-radius:14px;border:none;background:#5b9bd5;color:white;font-size:1.1em;cursor:pointer;font-weight:700">🥚 Alla djur redo</button>
+    <button onclick="cheatFeed()" style="padding:12px 18px;border-radius:14px;border:none;background:#d4a56a;font-size:1.1em;cursor:pointer;font-weight:700">🍽️ Mata alla djur</button>
+    <button onclick="cheatWater()" style="padding:12px 18px;border-radius:14px;border:none;background:#5bc0de;color:white;font-size:1.1em;cursor:pointer;font-weight:700">💧 Vattna allt</button>
+  </div>
+  <p style="text-align:center;margin-top:16px;font-size:.95em;color:#666">Mynt: <strong>${S.coins}</strong> | Nivå: <strong>${S.level}</strong> | XP: <strong>${S.xp}/${S.xpToNext}</strong></p>
+  <div style="margin-top:20px;padding-top:16px;border-top:2px dashed #ddd;text-align:center">
+    <button onclick="resetGame()" style="padding:14px 24px;border-radius:14px;border:none;background:#e74c3c;color:white;font-size:1.1em;cursor:pointer;font-weight:700">🗑️ Återställ allt &amp; börja om</button>
+    <p style="color:#999;font-size:.85em;margin-top:6px">Tar bort all sparad data och laddar om</p>
+  </div>`;
+}
+function cheat(key,amt){
+  if(key==='coins'){S.coins+=amt;toast(`💰 +${amt} mynt!`);}
+  else if(key==='xp'){addXP(amt);toast(`⭐ +${amt} XP!`);}
+  save();render();
+}
+function cheatGrow(){S.plots.forEach(p=>{if(p.type){p.ready=true;p.watered=true;}});toast('🌾 Alla grödor mogna!');save();render();}
+function cheatCollect(){S.animals.forEach(a=>{a.readyToCollect=true;});toast('🥚 Alla djur redo!');save();render();}
+function cheatFeed(){S.animals.forEach(a=>{a.hungry=false;a.hungerTimer=0;a.happiness=Math.min(100,a.happiness+30);});toast('🍽️ Alla djur mätta!');save();render();}
+function cheatWater(){S.plots.forEach(p=>{if(p.type)p.watered=true;});toast('💧 Allt vattnat!');save();render();}
+
+// ===== NEIGHBOR SYSTEM =====
+function offerNeighborHelp(){
+  if(S.neighborDebt>0)return; // already owes
+  let h='<h2>👩‍🌾 Grannen knackar på!</h2>';
+  h+='<p style="color:#666;margin:8px 0;line-height:1.5">"Hej! Jag såg att det är lite knapert med pengarna. Jag kan låna dig <b>25 mynt</b> — du betalar tillbaka <b>30 mynt</b> när du kan!"</p>';
+  h+='<div class="modal-opts">';
+  h+='<div class="mopt" onclick="acceptNeighbor()">🤝 Tack, gärna!</div>';
+  h+='<div class="mopt" onclick="closeM()">Nej tack, jag klarar mig</div>';
+  h+='</div>';
+  document.getElementById('mc').innerHTML=h;document.getElementById('modal').classList.add('show');
+}
+function acceptNeighbor(){
+  S.coins+=25;S.neighborDebt=30;S.neighborMood='happy';S.neighborTimer=0;
+  closeM();toast('👩‍🌾 Grannen gav dig 25 mynt!');save();render();
+}
+function payNeighbor(){
+  if(S.neighborDebt<=0)return;
+  if(S.coins<S.neighborDebt){toast(`💰 Du behöver ${S.neighborDebt} mynt för att betala tillbaka!`);return;}
+  S.coins-=S.neighborDebt;S.neighborDebt=0;S.neighborMood='happy';S.neighborTimer=0;
+  addXP(10);toast('👩‍🌾 "Tack så mycket! Du är en bra granne!"');save();render();
+}
+function updateNeighbor(){
+  if(S.neighborDebt<=0)return;
+  S.neighborTimer++;
+  // Mood worsens over time
+  if(S.neighborTimer<120)S.neighborMood='happy';
+  else if(S.neighborTimer<240)S.neighborMood='waiting';
+  else if(S.neighborTimer<400)S.neighborMood='annoyed';
+  else S.neighborMood='angry';
+  // If angry, take a decoration every ~200 ticks
+  if(S.neighborMood==='angry'&&S.neighborTimer%200===0){
+    const decos=Object.keys(S.decorations||{});
+    if(decos.length>0){
+      const taken=decos[Math.floor(Math.random()*decos.length)];
+      const d=DECOS[taken];
+      delete S.decorations[taken];
+      toast(`😠 Grannen tog din ${d?d.n:'prydnad'} som betalning!`);
+      S.neighborDebt=Math.max(0,S.neighborDebt-5);
+      if(S.neighborDebt<=0){S.neighborDebt=0;S.neighborMood='happy';S.neighborTimer=0;toast('👩‍🌾 "Nu är vi kvitt!"');}
+    }
+  }
+}
+function renderNeighborBadge(){
+  const el=document.getElementById('neighborBadge');
+  if(S.neighborDebt<=0){el.style.display='none';return;}
+  el.style.display='inline-block';
+  const moods={happy:['😊','#e8f5e9','#2e7d32'],waiting:['😐','#fff8e1','#f57f17'],annoyed:['😒','#fff3e0','#e65100'],angry:['😠','#fde0dc','#c62828']};
+  const[emoji,bg,col]=moods[S.neighborMood]||moods.happy;
+  el.style.background=bg;el.style.color=col;
+  if(S.neighborMood==='happy')el.textContent=`${emoji} Skuld till grannen: ${S.neighborDebt} 💰 — Tryck för att betala`;
+  else if(S.neighborMood==='waiting')el.textContent=`${emoji} Grannen väntar... ${S.neighborDebt} 💰 — Tryck för att betala`;
+  else if(S.neighborMood==='annoyed')el.textContent=`${emoji} Betala grannen! ${S.neighborDebt} 💰`;
+  else el.textContent=`${emoji} Grannen är arg! ${S.neighborDebt} 💰 — Hen tar prydnader!`;
+}
+
+// ===== GAME LOOP =====
+function gameLoop(){
+  const sp=growSpeed();
+  // Grow crops (only if watered or has sprinkler)
+  S.plots.forEach(p=>{
+    if(p.type&&!p.ready){
+      if(p.watered||S.hasSprinkler){p.elapsed+=sp;if(p.elapsed>=SEEDS[p.type].t)p.ready=true;}
+    }
+  });
+  // Animals: production, hunger, happiness
+  S.animals.forEach(a=>{
+    if(!a.hungry){
+      if(!a.readyToCollect){a.elapsed++;if(a.elapsed>=ANIMALS[a.type].intr)a.readyToCollect=true;}
+      a.hungerTimer++;
+      if(a.hungerTimer>=80){a.hungry=true;a.hungerTimer=0;}
+    }
+    // Happiness: flowers help, bigger stall = slower decay
+    let decay=a.hungry?1.5:(S.maxAnimals>=3?.2:.5);
+    if(S.buildings.flowers&&!a.hungry)a.happiness=Math.min(100,a.happiness+.3);
+    a.happiness=Math.max(0,a.happiness-decay);
+  });
+
+  // Well: auto re-water dried crops occasionally
+  if(S.buildings.well){
+    S.plots.forEach(p=>{if(p.type&&!p.ready&&!p.watered&&!S.hasSprinkler&&Math.random()<.08)p.watered=true;});
+  }
+
+  // Pond: generate fish every ~25 seconds (silent — shows in inventory)
+  if(S.buildings.pond){
+    if(!S.pondTimer)S.pondTimer=0;
+    S.pondTimer++;
+    if(S.pondTimer>=50){S.pondTimer=0;addInv('Fisk',1);}
+  }
+
+  // Silo: bonus harvest every ~35 seconds (silent — shows in inventory)
+  if(S.buildings.silo){
+    if(!S.siloTimer)S.siloTimer=0;
+    S.siloTimer++;
+    if(S.siloTimer>=70){S.siloTimer=0;
+      const crops=Object.keys(SEEDS);const rnd=crops[Math.floor(Math.random()*crops.length)];
+      addInv(rnd,1);}
+  }
+
+  // Proactive neighbor: if stuck with too few coins for 30s, offer help
+  if(S.coins<4&&S.neighborDebt<=0){
+    if(!S._brokeTimer)S._brokeTimer=0;
+    S._brokeTimer++;
+    if(S._brokeTimer>=30)offerNeighborHelp();
+  }else{S._brokeTimer=0;}
+  updateNeighbor();updWeather();updSeason();save();render();
+}
+
+function spawnCust(){
+  const mx=S.buildings.mailbox?4:3;if(S.customers.length>=mx)return;
+  const all=[];
+  for(const[id,s]of Object.entries(SEEDS))all.push({id,e:s.e,n:s.n,bv:s.v});
+  for(const[id,a]of Object.entries(ANIMALS))all.push({id:a.pn,e:a.prod,n:a.pn,bv:a.v});
+  if(S.buildings.pond)all.push({id:'Fisk',e:'🐟',n:'Fisk',bv:15});
+  const it=all[Math.floor(Math.random()*all.length)],am=Math.floor(Math.random()*3)+1;
+  S.customers.push({name:CNAMES[Math.floor(Math.random()*CNAMES.length)],emoji:CEMOJI[Math.floor(Math.random()*CEMOJI.length)],wants:it.id,wantE:it.e,wantN:it.n,amount:am,price:it.bv*am+Math.floor(Math.random()*5)+1});
+  render();
+}
+
+// ===== NAMING =====
+function showNaming(){
+  let h='<h2>🌻 Välkommen!</h2><p style="color:#666;margin:8px 0">Vad vill du kalla din bondgård?</p>';
+  h+='<input id="farmNameInput" type="text" placeholder="T.ex. Solrosgården" maxlength="24" style="width:90%;padding:12px;border-radius:12px;border:3px solid #6B8E23;font-size:1.15em;text-align:center;margin:10px 0;outline:none">';
+  h+='<div class="modal-opts"><div class="mopt" onclick="confirmName()">🌱 Starta!</div></div>';
+  document.getElementById('mc').innerHTML=h;document.getElementById('modal').classList.add('show');
+  setTimeout(()=>{const inp=document.getElementById('farmNameInput');if(inp)inp.focus();},100);
+}
+function confirmName(){
+  const inp=document.getElementById('farmNameInput');
+  S.farmName=(inp&&inp.value.trim())?inp.value.trim():'Min Bondgård';
+  closeM();save();render();toast(`🌻 Välkommen till ${S.farmName}!`);
+}
+
+// ===== START =====
+const wasLoaded=load();updWVis();render();
+if(wasLoaded)toast('💾 Välkommen tillbaka!');
+else showNaming();
+setInterval(gameLoop,1000);setInterval(spawnCust,15000);setTimeout(spawnCust,5000);
+</script>
+</body>
+</html>
