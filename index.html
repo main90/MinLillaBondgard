@@ -33,10 +33,15 @@ body.spring{background:#87CEEB}body.summer{background:#6dd5fa}body.autumn{backgr
 
 .gc{position:relative;z-index:2;max-width:720px;margin:0 auto;padding:12px;min-height:100vh}
 
-.header{background:rgba(139,90,43,.92);color:white;padding:12px 16px;border-radius:18px;margin-bottom:10px;text-align:center;box-shadow:0 4px 12px rgba(0,0,0,.2)}
-.header h1{font-size:1.5em;margin-bottom:3px}
-.stats{display:flex;justify-content:center;gap:14px;font-size:1.15em;flex-wrap:wrap}
-.badge{padding:4px 12px;border-radius:20px;font-size:.95em;margin-top:4px;display:inline-block}
+.header{background:rgba(139,90,43,.92);color:white;padding:12px 16px;border-radius:18px;margin-bottom:10px;box-shadow:0 4px 12px rgba(0,0,0,.2)}
+.header-row{display:flex;align-items:center;gap:12px}
+.header-left{cursor:pointer;text-align:center;flex-shrink:0}
+.header-left:active{opacity:.8}
+.header-center{flex:1;min-width:0;text-align:center}
+.header-right{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:4px}
+.header h1{font-size:1.3em;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stats{display:flex;justify-content:center;gap:10px;font-size:1.05em;flex-wrap:wrap}
+.badge{padding:3px 10px;border-radius:20px;font-size:.85em;display:inline-block}
 .w-badge{background:rgba(255,255,255,.2)}
 
 .tabs{display:flex;gap:4px;margin-bottom:10px}
@@ -115,6 +120,36 @@ body.spring{background:#87CEEB}body.summer{background:#6dd5fa}body.autumn{backgr
 .mopt:active{background:#e8f5d0;border-color:#6B8E23}
 .mclose{margin-top:10px;padding:10px 22px;background:#ccc;border:none;border-radius:12px;font-size:1.05em;cursor:pointer}
 
+/* Save slots */
+.slot-grid{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.slot-card{display:flex;align-items:center;gap:12px;padding:14px;border:3px solid #ddd;border-radius:14px;background:#fafafa;cursor:pointer;text-align:left;font-size:1em;width:100%}
+.slot-card:active{background:#e8f5d0;border-color:#6B8E23}
+.slot-card.active-slot{border-color:#6B8E23;background:#efffea}
+.slot-card .slot-icon{font-size:2em;flex-shrink:0}
+.slot-card .slot-info{flex:1;min-width:0}
+.slot-card .slot-name{font-weight:700;color:#5a3e1b;font-size:1.05em}
+.slot-card .slot-details{font-size:.85em;color:#888;margin-top:2px}
+.slot-card .slot-empty{color:#aaa;font-style:italic}
+.slot-del{background:none;border:none;font-size:1.2em;cursor:pointer;padding:4px 8px;border-radius:8px;opacity:.5}
+.slot-del:hover{opacity:1;background:rgba(231,76,60,.1)}
+.switch-user-btn{background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.3);color:white;padding:4px 12px;border-radius:12px;font-size:.85em;cursor:pointer;margin-top:4px}
+.switch-user-btn:active{background:rgba(255,255,255,.35)}
+
+/* Farmer avatar */
+.farmer-avatar{font-size:2em;line-height:1;position:relative}
+.farmer-avatar .fa-hat{position:absolute;top:-10px;left:50%;transform:translateX(-50%);font-size:.55em}
+.farmer-name{color:rgba(255,255,255,.9);font-size:.95em;font-weight:600}
+
+/* Farmer editor */
+.fe-preview{font-size:4em;text-align:center;margin:10px 0;line-height:1;position:relative;display:inline-block}
+.fe-preview .fa-hat{position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:.5em}
+.fe-section{margin:10px 0}
+.fe-section label{display:block;font-weight:700;color:#5a3e1b;font-size:.95em;margin-bottom:5px}
+.fe-options{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.fe-opt{width:44px;height:44px;border:3px solid #ddd;border-radius:12px;font-size:1.5em;cursor:pointer;display:flex;align-items:center;justify-content:center;background:#fafafa}
+.fe-opt:active{transform:scale(.95)}
+.fe-opt.sel{border-color:#6B8E23;background:#e8f5d0}
+
 /* Toast & Level up */
 .toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);background:rgba(0,0,0,.85);color:white;padding:16px 26px;border-radius:16px;font-size:1.2em;z-index:200;pointer-events:none;transition:transform .3s;text-align:center;max-width:85vw}
 .toast.show{transform:translate(-50%,-50%) scale(1)}
@@ -124,10 +159,11 @@ body.spring{background:#87CEEB}body.summer{background:#6dd5fa}body.autumn{backgr
 /* ===== MOBILE ===== */
 @media(max-width:480px){
   .gc{padding:8px 6px}
-  .header{padding:10px 10px;border-radius:14px;margin-bottom:8px}
-  .header h1{font-size:1.2em}
-  .stats{gap:8px;font-size:1em}
-  .badge{font-size:.85em;padding:3px 8px}
+  .header{padding:8px 10px;border-radius:14px;margin-bottom:8px}
+  .header-row{gap:8px}
+  .header h1{font-size:1em}
+  .stats{gap:6px;font-size:.9em}
+  .badge{font-size:.75em;padding:2px 6px}
 
   /* Tabs: icon only */
   .tabs{gap:3px;margin-bottom:8px}
@@ -167,6 +203,13 @@ body.spring{background:#87CEEB}body.summer{background:#6dd5fa}body.autumn{backgr
 
   /* Modal */
   .modal{padding:18px;border-radius:18px;max-width:92vw}
+  .switch-user-btn{font-size:.8em;padding:3px 10px}
+  .slot-card{padding:10px;gap:8px}
+  .slot-card .slot-icon{font-size:1.6em}
+  .farmer-avatar{font-size:1.6em}
+  .farmer-name{font-size:.65em}
+  .fe-opt{width:38px;height:38px;font-size:1.3em}
+  .fe-preview{font-size:3em}
 }
 </style>
 </head>
@@ -177,14 +220,25 @@ body.spring{background:#87CEEB}body.summer{background:#6dd5fa}body.autumn{backgr
 
 <div class="gc">
   <div class="header">
-    <h1 id="farmTitle">🌻 Min Lilla Bondgård 🌻</h1>
-    <div class="stats">
-      <span>💰 <span id="coins">30</span></span>
-      <span>⭐ Nivå <span id="level">1</span></span>
-      <span title="Erfarenhet — samla XP genom att skörda, samla och sälja!">🌟 <span id="xp">0</span>/<span id="xpMax">20</span> XP</span>
+    <div class="header-row">
+      <div class="header-left" onclick="showFarmerEditor()" title="Anpassa din bonde">
+        <div class="farmer-avatar" id="farmerAvatar">👩‍🌾</div>
+        <div class="farmer-name" id="farmerNameDisplay" style="font-size:.7em;margin-top:2px">Bansen</div>
+      </div>
+      <div class="header-center">
+        <h1 id="farmTitle">🌻 Min Lilla Bondgård 🌻</h1>
+        <div class="stats">
+          <span>💰 <span id="coins">30</span></span>
+          <span>⭐ Nivå <span id="level">1</span></span>
+          <span title="Erfarenhet — samla XP genom att skörda, samla och sälja!">🌟 <span id="xp">0</span>/<span id="xpMax">20</span> XP</span>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="badge w-badge" id="wBadge" style="font-size:.8em">☀️ Sol · 🌸 Vår</div>
+        <button class="switch-user-btn" onclick="showSlotSelector()">👤 Byt</button>
+      </div>
     </div>
-    <div class="badge w-badge" id="wBadge">☀️ Sol · 🌸 Vår</div>
-    <div class="badge" id="neighborBadge" style="display:none;cursor:pointer;margin-top:4px" onclick="payNeighbor()"></div>
+    <div class="badge" id="neighborBadge" style="display:none;cursor:pointer;margin-top:4px;text-align:center" onclick="payNeighbor()"></div>
   </div>
 
   <div class="inv" id="globalInv" style="margin-bottom:8px"><h3>📦 Lager</h3><div class="inv-items" id="globalInvItems"><span style="color:#999">Tomt!</span></div></div>
@@ -217,6 +271,7 @@ if(new URLSearchParams(location.search).get('dev')==='true'){
 // ===== STATE =====
 const S = {
   coins:75, xp:0, level:1, xpToNext:20, selectedSeed:'carrot', farmName:'',
+  farmerName:'', farmerSkin:0, farmerHair:0, farmerHat:0, farmerShirt:0,
   maxPlots:1, maxAnimals:1,
   plots:[ {type:null,elapsed:0,ready:false,watered:false} ],
   animals:[],
@@ -227,6 +282,10 @@ const S = {
   season:'spring', weather:'sunny', wTimer:0, sTimer:0, dayCount:0,
   pondTimer:0, siloTimer:0
 };
+
+const FARMER_SKINS=['👩‍🌾','👨‍🌾','🧑‍🌾','👧','👦','🧒','👩','👨','🧑','👵','👴','🧓'];
+const FARMER_HATS=['','🎩','🧢','👒','🪖','🎀','👑','🌸','🌻'];
+const FARMER_SHIRTS=['','🟢','🔵','🔴','🟡','🟣','🟤','⚪','🟠'];
 
 // ===== DATA =====
 const SEEDS = {
@@ -330,6 +389,11 @@ function render(){
   document.getElementById('xp').textContent=S.xp;
   document.getElementById('xpMax').textContent=S.xpToNext;
   if(S.farmName)document.getElementById('farmTitle').textContent='🌻 '+S.farmName+' 🌻';
+  // Farmer display
+  const skin=FARMER_SKINS[S.farmerSkin]||'👩‍🌾';
+  const hat=FARMER_HATS[S.farmerHat]||'';
+  document.getElementById('farmerAvatar').innerHTML=skin+(hat?'<span class="fa-hat">'+hat+'</span>':'');
+  document.getElementById('farmerNameDisplay').textContent=S.farmerName||'Bansen';
   rGlobalInv();rFarm();rAnimals();rShop();rBuild();rDev();rBadges();renderNeighborBadge();
 }
 
@@ -1078,10 +1142,33 @@ function upgHouse(){
   toast(`${nx.e} Uppgraderade till ${nx.n}!`);render();
 }
 
-// ===== SAVE & LOAD =====
-const SK='bondgard_v5';
-function save(){try{localStorage.setItem(SK,JSON.stringify({
-  farmName:S.farmName,coins:S.coins,xp:S.xp,level:S.level,xpToNext:S.xpToNext,
+// ===== SAVE SLOTS =====
+const MAX_SLOTS=5;
+const META_KEY='bondgard_meta';
+let currentSlot=0;
+
+function slotKey(i){return 'bondgard_v5_slot_'+i;}
+function getMeta(){try{const d=localStorage.getItem(META_KEY);return d?JSON.parse(d):{active:0};}catch(e){return {active:0};}}
+function saveMeta(m){try{localStorage.setItem(META_KEY,JSON.stringify(m));}catch(e){}}
+
+// Migrate old single-save to slot 0
+function migrateOldSave(){
+  const old=localStorage.getItem('bondgard_v5');
+  if(old&&!localStorage.getItem(slotKey(0))){
+    localStorage.setItem(slotKey(0),old);
+    localStorage.removeItem('bondgard_v5');
+    saveMeta({active:0});
+  }
+}
+
+function getSlotPreview(i){
+  try{const d=localStorage.getItem(slotKey(i));if(!d)return null;const s=JSON.parse(d);
+  return {name:s.farmName||'Namnlös',farmerName:s.farmerName||'',farmerSkin:s.farmerSkin??0,level:s.level||1,coins:s.coins||0,dayCount:s.dayCount||0};}catch(e){return null;}
+}
+
+function save(){try{localStorage.setItem(slotKey(currentSlot),JSON.stringify({
+  farmName:S.farmName,farmerName:S.farmerName,farmerSkin:S.farmerSkin,farmerHair:S.farmerHair,farmerHat:S.farmerHat,farmerShirt:S.farmerShirt,
+  coins:S.coins,xp:S.xp,level:S.level,xpToNext:S.xpToNext,
   plots:S.plots,maxPlots:S.maxPlots,maxAnimals:S.maxAnimals,
   animals:S.animals,inventory:S.inventory,buildings:S.buildings,
   houseLevel:S.houseLevel,hasSprinkler:S.hasSprinkler,decorations:S.decorations,
@@ -1089,21 +1176,84 @@ function save(){try{localStorage.setItem(SK,JSON.stringify({
   season:S.season,sTimer:S.sTimer,dayCount:S.dayCount,t:Date.now()
 }));}catch(e){}}
 
-function load(){try{
-  const d=localStorage.getItem(SK);if(!d)return false;const s=JSON.parse(d);
-  S.farmName=s.farmName||'';S.coins=s.coins??30;S.xp=s.xp??0;S.level=s.level??1;S.xpToNext=s.xpToNext??20;
+function loadSlot(i){try{
+  const d=localStorage.getItem(slotKey(i));if(!d)return false;const s=JSON.parse(d);
+  S.farmName=s.farmName||'';S.farmerName=s.farmerName||'';S.farmerSkin=s.farmerSkin??0;S.farmerHair=s.farmerHair??0;S.farmerHat=s.farmerHat??0;S.farmerShirt=s.farmerShirt??0;
+  S.coins=s.coins??30;S.xp=s.xp??0;S.level=s.level??1;S.xpToNext=s.xpToNext??20;
   S.maxPlots=s.maxPlots??1;S.maxAnimals=s.maxAnimals??1;
   S.plots=s.plots??[{type:null,elapsed:0,ready:false,watered:false}];
   S.animals=s.animals??[];S.inventory=s.inventory??{};S.buildings=s.buildings??{};
   S.houseLevel=s.houseLevel??0;S.hasSprinkler=s.hasSprinkler??false;S.decorations=s.decorations??{};
   S.neighborDebt=s.neighborDebt??0;S.neighborMood=s.neighborMood??'happy';S.neighborTimer=s.neighborTimer??0;
   S.season=s.season??'spring';S.sTimer=s.sTimer??0;S.dayCount=s.dayCount??0;
+  S.customers=[];S.selectedSeed='carrot';
   while(S.plots.length<S.maxPlots)S.plots.push({type:null,elapsed:0,ready:false,watered:false});
-  // Ensure animals have hunger fields
   S.animals.forEach(a=>{if(a.hungry===undefined){a.hungry=false;a.hungerTimer=0;a.fedCount=0;}});
-  return true;}catch(e){return false;}}
+  currentSlot=i;saveMeta({active:i});return true;}catch(e){return false;}}
 
-function resetGame(){if(confirm('Börja om? Allt försvinner!')){localStorage.removeItem(SK);location.reload();}}
+function load(){return loadSlot(currentSlot);}
+
+function resetDefaults(){
+  S.coins=75;S.xp=0;S.level=1;S.xpToNext=20;S.selectedSeed='carrot';S.farmName='';
+  S.farmerName='';S.farmerSkin=0;S.farmerHair=0;S.farmerHat=0;S.farmerShirt=0;
+  S.maxPlots=1;S.maxAnimals=1;S.plots=[{type:null,elapsed:0,ready:false,watered:false}];
+  S.animals=[];S.inventory={};S.customers=[];S.buildings={};S.decorations={};
+  S.houseLevel=0;S.hasSprinkler=false;S.neighborDebt=0;S.neighborMood='happy';S.neighborTimer=0;
+  S.season='spring';S.weather='sunny';S.wTimer=0;S.sTimer=0;S.dayCount=0;S.pondTimer=0;S.siloTimer=0;
+}
+
+function showSlotSelector(){
+  let h='<h2>👤 Välj sparplats</h2>';
+  h+='<p style="color:#666;margin:6px 0;font-size:.9em">Max '+MAX_SLOTS+' sparade spel</p>';
+  h+='<div class="slot-grid">';
+  for(let i=0;i<MAX_SLOTS;i++){
+    const p=getSlotPreview(i);
+    const isActive=i===currentSlot;
+    if(p){
+      h+='<div class="slot-card'+(isActive?' active-slot':'')+'" onclick="switchSlot('+i+')">';
+      h+='<div class="slot-icon">'+(FARMER_SKINS[p.farmerSkin]||'👩‍🌾')+'</div>';
+      h+='<div class="slot-info"><div class="slot-name">'+(p.farmerName||'Bansen')+' — '+p.name+'</div>';
+      h+='<div class="slot-details">Nivå '+p.level+' · '+p.coins+' mynt · Dag '+p.dayCount+'</div></div>';
+      if(!isActive)h+='<button class="slot-del" onclick="event.stopPropagation();deleteSlot('+i+')" title="Radera">🗑️</button>';
+      h+='</div>';
+    } else {
+      h+='<div class="slot-card" onclick="newGameInSlot('+i+')">';
+      h+='<div class="slot-icon">➕</div>';
+      h+='<div class="slot-info"><div class="slot-empty">Tomt — starta nytt spel</div></div>';
+      h+='</div>';
+    }
+  }
+  h+='</div>';
+  h+='<button class="mclose" onclick="closeM()">Stäng</button>';
+  document.getElementById('mc').innerHTML=h;document.getElementById('modal').classList.add('show');
+}
+
+function switchSlot(i){
+  if(i===currentSlot){closeM();return;}
+  save(); // save current game first
+  if(loadSlot(i)){
+    closeM();updWVis();render();toast('💾 Bytte till '+S.farmName);
+  }
+}
+
+function newGameInSlot(i){
+  save(); // save current game first
+  currentSlot=i;saveMeta({active:i});
+  resetDefaults();
+  closeM();updWVis();render();showNaming();
+}
+
+function deleteSlot(i){
+  const p=getSlotPreview(i);
+  if(!p)return;
+  if(confirm('Radera "'+p.name+'"? Allt sparas bort!')){
+    localStorage.removeItem(slotKey(i));
+    showSlotSelector(); // refresh the list
+    toast('🗑️ Raderade '+p.name);
+  }
+}
+
+function resetGame(){if(confirm('Börja om? Allt på denna sparplats försvinner!')){localStorage.removeItem(slotKey(currentSlot));location.reload();}}
 
 // ===== HELPERS =====
 function addInv(item,n){S.inventory[item]=(S.inventory[item]||0)+n;}
@@ -1249,35 +1399,192 @@ function gameLoop(){
     S._brokeTimer++;
     if(S._brokeTimer>=30)offerNeighborHelp();
   }else{S._brokeTimer=0;}
+
+  // Game over detection
+  checkGameOver();
+
   updateNeighbor();updWeather();updSeason();save();render();
 }
 
 function spawnCust(){
   const mx=S.buildings.mailbox?4:3;if(S.customers.length>=mx)return;
   const all=[];
-  for(const[id,s]of Object.entries(SEEDS))all.push({id,e:s.e,n:s.n,bv:s.v});
-  for(const[id,a]of Object.entries(ANIMALS))all.push({id:a.pn,e:a.prod,n:a.pn,bv:a.v});
+  // Only include seeds the player can actually grow (season or greenhouse)
+  for(const[id,s]of Object.entries(SEEDS)){
+    if(s.season&&s.season!==S.season&&!S.buildings.greenhouse)continue;
+    all.push({id,e:s.e,n:s.n,bv:s.v});
+  }
+  // Only include animal products the player actually has animals for
+  for(const[id,a]of Object.entries(ANIMALS)){
+    if(S.animals.some(x=>x.type===id))all.push({id:a.pn,e:a.prod,n:a.pn,bv:a.v});
+  }
   if(S.buildings.pond)all.push({id:'Fisk',e:'🐟',n:'Fisk',bv:15});
-  const it=all[Math.floor(Math.random()*all.length)],am=Math.floor(Math.random()*3)+1;
+  if(!all.length)return; // nothing available to sell
+  // Weight towards items the player has in stock (3x more likely)
+  const weighted=[];
+  all.forEach(it=>{
+    const inStock=(S.inventory[it.id]||0)>0;
+    weighted.push(it);
+    if(inStock){weighted.push(it);weighted.push(it);}
+  });
+  const it=weighted[Math.floor(Math.random()*weighted.length)],am=Math.floor(Math.random()*3)+1;
   S.customers.push({name:CNAMES[Math.floor(Math.random()*CNAMES.length)],emoji:CEMOJI[Math.floor(Math.random()*CEMOJI.length)],wants:it.id,wantE:it.e,wantN:it.n,amount:am,price:it.bv*am+Math.floor(Math.random()*5)+1});
   render();
 }
 
-// ===== NAMING =====
-function showNaming(){
-  let h='<h2>🌻 Välkommen!</h2><p style="color:#666;margin:8px 0">Vad vill du kalla din bondgård?</p>';
-  h+='<input id="farmNameInput" type="text" placeholder="T.ex. Solrosgården" maxlength="24" style="width:90%;padding:12px;border-radius:12px;border:3px solid #6B8E23;font-size:1.15em;text-align:center;margin:10px 0;outline:none">';
-  h+='<div class="modal-opts"><div class="mopt" onclick="confirmName()">🌱 Starta!</div></div>';
-  document.getElementById('mc').innerHTML=h;document.getElementById('modal').classList.add('show');
-  setTimeout(()=>{const inp=document.getElementById('farmNameInput');if(inp)inp.focus();},100);
+// ===== GAME OVER =====
+function isStuck(){
+  // Can the neighbor still help? (no existing debt)
+  if(S.neighborDebt<=0)return false;
+
+  // Find cheapest plantable seed
+  const cheapest=Math.min(...Object.values(SEEDS).filter(s=>!s.season||s.season===S.season||S.buildings.greenhouse).map(s=>s.c));
+  // Can afford to plant?
+  if(S.coins>=cheapest)return false;
+
+  // Any crops growing or ready to harvest?
+  if(S.plots.some(p=>p.type))return false;
+
+  // Any animal producing or ready to collect?
+  if(S.animals.some(a=>a.readyToCollect))return false;
+  // Any non-hungry animal still producing?
+  if(S.animals.some(a=>!a.hungry))return false;
+  // Any hungry animal we can feed? (have matching food in inventory)
+  if(S.animals.some(a=>{
+    if(!a.hungry)return false;
+    const t=ANIMALS[a.type];
+    const foodSeed=Object.entries(SEEDS).find(([,s])=>s.e===t.food);
+    return foodSeed&&(S.inventory[foodSeed[0]]||0)>0;
+  }))return false;
+
+  // Passive generators running?
+  if(S.buildings.pond||S.buildings.silo)return false;
+
+  // Anything in inventory that a current customer wants?
+  if(S.customers.some(c=>(S.inventory[c.wants]||0)>=c.amount))return false;
+
+  // Anything in inventory at all? New customers might want it
+  const totalInv=Object.values(S.inventory).reduce((a,b)=>a+b,0);
+  if(totalInv>0)return false;
+
+  return true;
 }
-function confirmName(){
-  const inp=document.getElementById('farmNameInput');
-  S.farmName=(inp&&inp.value.trim())?inp.value.trim():'Min Bondgård';
-  closeM();save();render();toast(`🌻 Välkommen till ${S.farmName}!`);
+
+function checkGameOver(){
+  if(S._gameOver)return;
+  if(!isStuck()){S._stuckTimer=0;return;}
+  // Grace period: must be stuck for 10 consecutive seconds
+  if(!S._stuckTimer)S._stuckTimer=0;
+  S._stuckTimer++;
+  if(S._stuckTimer<10)return;
+  S._gameOver=true;
+  showGameOver();
+}
+
+function showGameOver(){
+  let h='<h2>😢 Spelet är slut</h2>';
+  h+='<p style="color:#666;margin:10px 0;line-height:1.5">Du har inga pengar, inget i lagret och inget som växer. Det finns tyvärr inget mer du kan göra.</p>';
+  h+='<div style="background:#f8f3e8;border-radius:12px;padding:12px;margin:10px 0;text-align:left;font-size:.95em">';
+  h+='<div style="font-weight:700;color:#5a3e1b;margin-bottom:4px">📊 Din gård</div>';
+  h+=`<div>⭐ Nivå ${S.level} · 📅 Dag ${S.dayCount}</div>`;
+  h+=`<div>🌱 ${S.maxPlots} odlingsrutor · 🐔 ${S.animals.length} djur</div>`;
+  h+=`<div>🏗️ ${Object.keys(S.buildings).length} byggnader</div>`;
+  h+='</div>';
+  h+='<div class="modal-opts">';
+  h+='<div class="mopt" onclick="restartSlot()" style="background:#e8f5d0;border-color:#6B8E23">🌱 Börja om på nytt</div>';
+  h+='<div class="mopt" onclick="gameOverToSlots()">👤 Byt till annan spelare</div>';
+  h+='</div>';
+  document.getElementById('mc').innerHTML=h;document.getElementById('modal').classList.add('show');
+}
+
+function restartSlot(){
+  localStorage.removeItem(slotKey(currentSlot));
+  resetDefaults();S._gameOver=false;S._stuckTimer=0;
+  closeM();save();updWVis();render();showNaming();
+}
+
+function gameOverToSlots(){
+  localStorage.removeItem(slotKey(currentSlot));
+  S._gameOver=false;S._stuckTimer=0;
+  closeM();showSlotSelector();
+}
+
+// ===== NAMING & FARMER SETUP =====
+function showNaming(){
+  let h='<h2>🌻 Välkommen!</h2>';
+  h+='<p style="color:#666;margin:8px 0">Vad heter du, bansen?</p>';
+  h+='<input id="farmerNameInput" type="text" placeholder="T.ex. Erik" maxlength="16" style="width:90%;padding:12px;border-radius:12px;border:3px solid #6B8E23;font-size:1.15em;text-align:center;margin:6px 0;outline:none">';
+  h+='<p style="color:#666;margin:8px 0">Välj din karaktär:</p>';
+  h+='<div class="fe-options" style="margin-bottom:10px">';
+  FARMER_SKINS.forEach((s,i)=>{h+='<div class="fe-opt'+(i===0?' sel':'')+'" onclick="pickSetupSkin('+i+',this)">'+s+'</div>';});
+  h+='</div>';
+  h+='<p style="color:#666;margin:8px 0">Vad vill du kalla din bondgård?</p>';
+  h+='<input id="farmNameInput" type="text" placeholder="T.ex. Solrosgården" maxlength="24" style="width:90%;padding:12px;border-radius:12px;border:3px solid #6B8E23;font-size:1.15em;text-align:center;margin:6px 0;outline:none">';
+  h+='<div class="modal-opts"><div class="mopt" onclick="confirmSetup()">🌱 Starta!</div></div>';
+  document.getElementById('mc').innerHTML=h;document.getElementById('modal').classList.add('show');
+  setTimeout(()=>{const inp=document.getElementById('farmerNameInput');if(inp)inp.focus();},100);
+}
+let _setupSkin=0;
+function pickSetupSkin(i,el){
+  _setupSkin=i;
+  el.parentElement.querySelectorAll('.fe-opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');
+}
+function confirmSetup(){
+  const fInp=document.getElementById('farmerNameInput');
+  const nInp=document.getElementById('farmNameInput');
+  S.farmerName=(fInp&&fInp.value.trim())?fInp.value.trim():'Bansen';
+  S.farmerSkin=_setupSkin;
+  S.farmName=(nInp&&nInp.value.trim())?nInp.value.trim():'Min Bondgård';
+  closeM();save();render();toast(`🌻 Välkommen till ${S.farmName}, ${S.farmerName}!`);
+}
+
+// ===== FARMER EDITOR =====
+function showFarmerEditor(){
+  let h='<h2>👤 Anpassa din bonde</h2>';
+  // Preview
+  const skin=FARMER_SKINS[S.farmerSkin]||'👩‍🌾';
+  const hat=FARMER_HATS[S.farmerHat]||'';
+  h+='<div style="text-align:center"><div class="fe-preview" id="fePreview">'+skin+(hat?'<span class="fa-hat">'+hat+'</span>':'')+'</div></div>';
+  // Farmer name
+  h+='<div class="fe-section"><label>Namn</label>';
+  h+='<input id="feNameInput" type="text" value="'+(S.farmerName||'').replace(/"/g,'&quot;')+'" placeholder="Bondens namn" maxlength="16" style="width:90%;padding:10px;border-radius:10px;border:3px solid #6B8E23;font-size:1.05em;text-align:center;outline:none"></div>';
+  // Farm name
+  h+='<div class="fe-section"><label>Gårdsnamn</label>';
+  h+='<input id="feFarmNameInput" type="text" value="'+(S.farmName||'').replace(/"/g,'&quot;')+'" placeholder="Gårdens namn" maxlength="24" style="width:90%;padding:10px;border-radius:10px;border:3px solid #6B8E23;font-size:1.05em;text-align:center;outline:none"></div>';
+  // Skin
+  h+='<div class="fe-section"><label>Karaktär</label><div class="fe-options">';
+  FARMER_SKINS.forEach((s,i)=>{h+='<div class="fe-opt'+(i===S.farmerSkin?' sel':'')+'" onclick="fePickSkin('+i+',this)">'+s+'</div>';});
+  h+='</div></div>';
+  // Hat
+  h+='<div class="fe-section"><label>Hatt</label><div class="fe-options">';
+  FARMER_HATS.forEach((s,i)=>{h+='<div class="fe-opt'+(i===S.farmerHat?' sel':'')+'" onclick="fePickHat('+i+',this)">'+(s||'❌')+'</div>';});
+  h+='</div></div>';
+  h+='<div class="modal-opts"><div class="mopt" onclick="saveFarmerEdit()" style="background:#e8f5d0;border-color:#6B8E23">✅ Spara</div></div>';
+  h+='<button class="mclose" onclick="closeM()">Avbryt</button>';
+  document.getElementById('mc').innerHTML=h;document.getElementById('modal').classList.add('show');
+}
+function feUpdatePreview(){
+  const el=document.getElementById('fePreview');if(!el)return;
+  const skin=FARMER_SKINS[S._feSkin??S.farmerSkin]||'👩‍🌾';
+  const hat=FARMER_HATS[S._feHat??S.farmerHat]||'';
+  el.innerHTML=skin+(hat?'<span class="fa-hat">'+hat+'</span>':'');
+}
+function fePickSkin(i,el){S._feSkin=i;el.parentElement.querySelectorAll('.fe-opt').forEach(o=>o.classList.remove('sel'));el.classList.add('sel');feUpdatePreview();}
+function fePickHat(i,el){S._feHat=i;el.parentElement.querySelectorAll('.fe-opt').forEach(o=>o.classList.remove('sel'));el.classList.add('sel');feUpdatePreview();}
+function saveFarmerEdit(){
+  const nameInp=document.getElementById('feNameInput');
+  const farmInp=document.getElementById('feFarmNameInput');
+  S.farmerName=(nameInp&&nameInp.value.trim())?nameInp.value.trim():'Bansen';
+  S.farmName=(farmInp&&farmInp.value.trim())?farmInp.value.trim():'Min Bondgård';
+  if(S._feSkin!==undefined){S.farmerSkin=S._feSkin;delete S._feSkin;}
+  if(S._feHat!==undefined){S.farmerHat=S._feHat;delete S._feHat;}
+  closeM();save();render();toast('👤 Sparade ändringar!');
 }
 
 // ===== START =====
+migrateOldSave();
+const meta=getMeta();currentSlot=meta.active||0;
 const wasLoaded=load();updWVis();render();
 if(wasLoaded)toast('💾 Välkommen tillbaka!');
 else showNaming();
