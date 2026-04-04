@@ -247,7 +247,7 @@ body.spring{background:#87CEEB}body.summer{background:#6dd5fa}body.autumn{backgr
     <button class="tab active" onclick="sTab('farm')">🌱<span class="tab-label"> Odla</span></button>
     <button class="tab" onclick="sTab('animals')">🐔<span class="tab-label"> Djur</span></button>
     <button class="tab" onclick="sTab('shop')">🏪<span class="tab-label"> Butik</span></button>
-    <button class="tab" onclick="sTab('build')">🏗️<span class="tab-label"> Bygg</span></button>
+    <button class="tab" onclick="sTab('build')">🏡<span class="tab-label"> Gård</span></button>
     <button class="tab" onclick="sTab('dev')" id="dev-tab" style="background:rgba(255,100,100,.4);font-size:.85em;display:none">🔧 Dev</button>
   </div>
 
@@ -442,7 +442,7 @@ function rFarm(){
   const show=Math.max(S.maxPlots,3);
   h+='<div class="farm-grid">';
   for(let i=0;i<show;i++){
-    if(i>=S.maxPlots){h+=`<div class="plot locked"><span>🔒</span><span class="plot-label">Bygg fler i Bygg-fliken</span></div>`;continue;}
+    if(i>=S.maxPlots){h+=`<div class="plot locked"><span>🔒</span><span class="plot-label">Bygg fler i Gård-fliken</span></div>`;continue;}
     const pl=S.plots[i];
     if(!pl||!pl.type){
       h+=`<div class="plot" onclick="plant(${i})"><span>🕳️</span><span class="plot-label">Plantera</span></div>`;
@@ -473,7 +473,7 @@ function rAnimals(){
       h+=`<div class="a-card ${cls}" onclick="interactA(${i})"><div class="ae">${t.e}</div><div class="an">${a.name}</div><div class="ai">${info}</div></div>`;});
     h+='</div>';}
   if(S.animals.length<S.maxAnimals)h+=`<button class="buy-btn" onclick="showBuyA()">➕ Köp djur (${S.animals.length}/${S.maxAnimals})</button>`;
-  else h+=`<div style="text-align:center;padding:14px;color:#999;font-size:.95em">Alla stallplatser fulla! Bygg fler i Bygg-fliken.</div>`;
+  else h+=`<div style="text-align:center;padding:14px;color:#999;font-size:.95em">Alla stallplatser fulla! Bygg fler i Gård-fliken.</div>`;
   p.innerHTML=h;
 }
 
@@ -501,8 +501,6 @@ function drawFarm(cv){
   // Dirt path from center to bottom
   c.fillStyle='#9a7a48';c.beginPath();c.moveTo(W*.46,H*.55);c.quadraticCurveTo(W*.47,H*.75,W*.48,H);c.lineTo(W*.54,H);c.quadraticCurveTo(W*.53,H*.75,W*.54,H*.55);c.fill();
   c.fillStyle='#8a6a38';for(let y=H*.56;y<H;y+=12){c.fillRect(W*.48,y,2,4);c.fillRect(W*.52,y+6,2,4);}
-  // Path to crops (upper right)
-  if(S.maxPlots>0){c.fillStyle='#9a7a48';c.beginPath();c.moveTo(W*.55,H*.42);c.quadraticCurveTo(W*.65,H*.35,W*.72,H*.12);c.lineTo(W*.76,H*.14);c.quadraticCurveTo(W*.67,H*.37,W*.57,H*.44);c.fill();}
   // Path to stall (lower left)
   if(S.maxAnimals>0){c.fillStyle='#9a7a48';c.beginPath();c.moveTo(W*.43,H*.55);c.quadraticCurveTo(W*.3,H*.6,W*.18,H*.65);c.lineTo(W*.2,H*.68);c.quadraticCurveTo(W*.32,H*.62,W*.45,H*.57);c.fill();}
   // === FENCE ===
@@ -579,12 +577,92 @@ function drawFarm(cv){
   S.animals.forEach((a,i)=>{
     if(i>=animPos.length)return;
     const[ax,ay]=animPos[i],t=ANIMALS[a.type];
-    const col=t.e==='🐔'?'#d4a020':t.e==='🐷'?'#e8a0a0':t.e==='🐑'?'#e8e8e0':'#8a6040';
-    const bob=Math.sin(_farmT*.1+i*2)*2;
-    c.fillStyle=col;c.beginPath();c.ellipse(ax,ay+bob,10,7,0,0,Math.PI*2);c.fill();
-    c.fillStyle='rgba(0,0,0,.15)';c.beginPath();c.ellipse(ax,ay+9,8,3,0,0,Math.PI*2);c.fill();
-    if(a.hungry){c.fillStyle='#e74c3c';c.font='bold 10px sans-serif';c.textAlign='center';c.fillText('!',ax,ay-10+bob);}
-    if(a.readyToCollect){c.fillStyle='#f0c040';c.font='10px sans-serif';c.textAlign='center';c.fillText('★',ax,ay-10+bob);}
+    const bob=Math.sin(_farmT*.1+i*2)*2,y=ay+bob;
+    // Shadow
+    c.fillStyle='rgba(0,0,0,.1)';c.beginPath();c.ellipse(ax,ay+12,9,3,0,0,Math.PI*2);c.fill();
+
+    if(a.type==='chicken'){
+      // Body
+      c.fillStyle='#e8c840';c.beginPath();c.ellipse(ax,y+2,8,6,0,0,Math.PI*2);c.fill();
+      // Wing
+      c.fillStyle='#d4a830';c.beginPath();c.ellipse(ax+4,y+2,5,4,.3,0,Math.PI*2);c.fill();
+      // Head
+      c.fillStyle='#e8c840';c.beginPath();c.arc(ax-6,y-4,5,0,Math.PI*2);c.fill();
+      // Eye
+      c.fillStyle='#1a1a1a';c.beginPath();c.arc(ax-8,y-5,1.2,0,Math.PI*2);c.fill();
+      // Beak
+      c.fillStyle='#e08020';c.beginPath();c.moveTo(ax-10,y-4);c.lineTo(ax-14,y-3);c.lineTo(ax-10,y-2);c.closePath();c.fill();
+      // Comb
+      c.fillStyle='#d03030';c.beginPath();c.arc(ax-6,y-9,3,0,Math.PI*2);c.fill();
+      c.beginPath();c.arc(ax-4,y-8,2.5,0,Math.PI*2);c.fill();
+      // Wattle
+      c.fillStyle='#d03030';c.beginPath();c.ellipse(ax-8,y-1,2,3,0,0,Math.PI*2);c.fill();
+      // Legs
+      c.strokeStyle='#c07020';c.lineWidth=1.5;
+      c.beginPath();c.moveTo(ax-3,y+7);c.lineTo(ax-4,y+12);c.stroke();
+      c.beginPath();c.moveTo(ax+2,y+7);c.lineTo(ax+3,y+12);c.stroke();
+    } else if(a.type==='pig'){
+      // Body
+      c.fillStyle='#f0b0b0';c.beginPath();c.ellipse(ax,y+2,11,8,0,0,Math.PI*2);c.fill();
+      // Head
+      c.fillStyle='#f0b0b0';c.beginPath();c.arc(ax-9,y-2,7,0,Math.PI*2);c.fill();
+      // Snout
+      c.fillStyle='#e89090';c.beginPath();c.ellipse(ax-14,y-1,4,3,0,0,Math.PI*2);c.fill();
+      // Nostrils
+      c.fillStyle='#c07070';c.beginPath();c.arc(ax-15,y-2,1,0,Math.PI*2);c.fill();
+      c.beginPath();c.arc(ax-13,y-2,1,0,Math.PI*2);c.fill();
+      // Eyes
+      c.fillStyle='#1a1a1a';c.beginPath();c.arc(ax-8,y-4,1.5,0,Math.PI*2);c.fill();
+      // Ears
+      c.fillStyle='#e8a0a0';c.beginPath();c.ellipse(ax-6,y-8,4,3,-.5,0,Math.PI*2);c.fill();
+      // Tail (curly)
+      c.strokeStyle='#e89898';c.lineWidth=1.5;c.beginPath();c.moveTo(ax+10,y);
+      c.quadraticCurveTo(ax+15,y-5,ax+13,y-8);c.stroke();
+      // Legs
+      c.fillStyle='#e8a0a0';c.fillRect(ax-6,y+8,4,5);c.fillRect(ax+2,y+8,4,5);
+      // Hooves
+      c.fillStyle='#8a6060';c.fillRect(ax-6,y+12,4,2);c.fillRect(ax+2,y+12,4,2);
+    } else if(a.type==='sheep'){
+      // Woolly body
+      c.fillStyle='#f0ece0';
+      for(let j=0;j<6;j++){const ox=Math.cos(j*1.1)*7,oy=Math.sin(j*1.1)*4;
+        c.beginPath();c.arc(ax+ox,y+2+oy,6,0,Math.PI*2);c.fill();}
+      // Head
+      c.fillStyle='#2a2a2a';c.beginPath();c.arc(ax-10,y-1,5,0,Math.PI*2);c.fill();
+      // Eyes
+      c.fillStyle='#e0e0e0';c.beginPath();c.arc(ax-12,y-2,1.5,0,Math.PI*2);c.fill();
+      c.fillStyle='#1a1a1a';c.beginPath();c.arc(ax-12,y-2,0.8,0,Math.PI*2);c.fill();
+      // Ears
+      c.fillStyle='#3a3a3a';c.beginPath();c.ellipse(ax-8,y-5,3,2,-.6,0,Math.PI*2);c.fill();
+      // Legs
+      c.fillStyle='#2a2a2a';c.fillRect(ax-5,y+7,3,6);c.fillRect(ax+3,y+7,3,6);
+    } else {
+      // Cow
+      c.fillStyle='#f0f0f0';c.beginPath();c.ellipse(ax,y+2,12,8,0,0,Math.PI*2);c.fill();
+      // Spots
+      c.fillStyle='#3a3a3a';c.beginPath();c.ellipse(ax-4,y,5,4,.3,0,Math.PI*2);c.fill();
+      c.beginPath();c.ellipse(ax+6,y+3,4,3,-.2,0,Math.PI*2);c.fill();
+      // Head
+      c.fillStyle='#f0f0f0';c.beginPath();c.arc(ax-11,y-2,6,0,Math.PI*2);c.fill();
+      // Muzzle
+      c.fillStyle='#f0c8b0';c.beginPath();c.ellipse(ax-15,y,4,3,0,0,Math.PI*2);c.fill();
+      // Nostrils
+      c.fillStyle='#a08070';c.beginPath();c.arc(ax-16,y-1,1,0,Math.PI*2);c.fill();
+      c.beginPath();c.arc(ax-14,y-1,1,0,Math.PI*2);c.fill();
+      // Eyes
+      c.fillStyle='#1a1a1a';c.beginPath();c.arc(ax-10,y-4,1.5,0,Math.PI*2);c.fill();
+      // Horns
+      c.fillStyle='#c8b898';c.beginPath();c.moveTo(ax-9,y-7);c.lineTo(ax-12,y-12);c.lineTo(ax-7,y-8);c.fill();
+      c.beginPath();c.moveTo(ax-13,y-7);c.lineTo(ax-16,y-12);c.lineTo(ax-11,y-8);c.fill();
+      // Ears
+      c.fillStyle='#e0d8d0';c.beginPath();c.ellipse(ax-7,y-6,3,2,-.5,0,Math.PI*2);c.fill();
+      // Udder
+      c.fillStyle='#f0c0c0';c.beginPath();c.ellipse(ax+2,y+9,4,3,0,0,Math.PI*2);c.fill();
+      // Legs
+      c.fillStyle='#e8e0d8';c.fillRect(ax-7,y+8,4,6);c.fillRect(ax+4,y+8,4,6);
+      // Hooves
+      c.fillStyle='#3a3a3a';c.fillRect(ax-7,y+13,4,2);c.fillRect(ax+4,y+13,4,2);
+    }
   });
   // === HOUSE — scales with houseLevel ===
   const hl=S.houseLevel;
@@ -745,9 +823,9 @@ function drawFarm(cv){
   if(S.buildings.flowers){const flx=W*.36,fly=H*.22;['#e04060','#e0a020','#d060c0','#6060e0','#e06020'].forEach((fc,i)=>{c.fillStyle=fc;c.beginPath();c.arc(flx-8+i*5,fly+Math.sin(i*1.5)*3,3,0,Math.PI*2);c.fill();});c.fillStyle='#2a8a20';c.fillRect(flx-10,fly+4,25,2);}
   // === DECORATIONS ===
   const decoSlots=[
-    [W*.38,H*.28],[W*.64,H*.28],[W*.32,H*.44],[W*.68,H*.44],
-    [W*.42,H*.68],[W*.62,H*.68],[W*.76,H*.56],[W*.36,H*.56],
-    [W*.46,H*.76],[W*.58,H*.76],[W*.70,H*.48],[W*.78,H*.88]
+    [W*.36,H*.10],[W*.42,H*.22],[W*.32,H*.36],[W*.20,H*.28],
+    [W*.44,H*.68],[W*.56,H*.68],[W*.66,H*.62],[W*.76,H*.62],
+    [W*.48,H*.78],[W*.60,H*.78],[W*.70,H*.78],[W*.82,H*.78]
   ];
   const ownedDecos=Object.keys(S.decorations||{});
   ownedDecos.forEach((id,i)=>{
